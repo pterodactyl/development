@@ -70,8 +70,11 @@ opcache.enable = 1
 opcache.enable_cli = 1
 EOF
 
+# Install development dependencies
+yarn install --no-progress
+
 # Cleanup
-rm -rf /var/www
-rm -r /etc/nginx/sites-enabled/*
+rm -rfv /var/www
+rm -rv /etc/nginx/sites-enabled/*
 ln -s /etc/nginx/sites-available/pterodactyl.local.conf /etc/nginx/sites-enabled/pterodactyl.local.conf
 service nginx restart
