@@ -17,6 +17,7 @@ apt -y install software-properties-common \
 	php7.2-fpm \
 	php7.2-curl \
 	php7.2-zip \
+	php7.2-xdebug \
 	nginx \
 	curl \
 	tar \
@@ -70,6 +71,11 @@ opcache.enable = 1
 opcache.enable_cli = 1
 EOF
 
+cat >> /etc/php/7.2/fpm/conf.d/20-xdebug.ini <<EOF
+xdebug.remote_enable=1
+xdebug.profiler_enable=1
+EOF
+
 # Install development dependencies
 yarn install --no-progress
 
@@ -77,4 +83,5 @@ yarn install --no-progress
 rm -rfv /var/www
 rm -rv /etc/nginx/sites-enabled/*
 ln -s /etc/nginx/sites-available/pterodactyl.local.conf /etc/nginx/sites-enabled/pterodactyl.local.conf
+service php7.2-fpm restart
 service nginx restart
