@@ -21,7 +21,7 @@ Vagrant.configure("2") do |config|
 
 		app.vm.synced_folder ".", "/vagrant", disabled: true
 		app.vm.synced_folder "code/panel", "/srv/www", type: "nfs",
-			mount_options: ["rw", "vers=3", "tcp", "fsc" ,"actimeo=1"]
+			mount_options: ["rw", "vers=3", "tcp", "fsc" ,"actimeo=1"],
 			linux__nfs_options: ["rw", "no_subtree_check", "all_squash", "async"]
 
 		app.vm.network "forwarded_port", guest: 80, host: 80
