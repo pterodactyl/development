@@ -3,6 +3,7 @@ export DEBIAN_FRONTEND=noninteractive
 
 # Install the dependencies for core software.
 add-apt-repository -y ppa:ondrej/php
+apt -y update && apt -y upgrade
 apt -y install software-properties-common \
 	php7.2 \
 	php7.2-cli \
@@ -33,9 +34,19 @@ curl -sS https://getcomposer.org/installer | sudo php -- --install-dir=/usr/loca
 cd /srv/www
 chmod -R 755 storage/* bootstrap/cache
 
-composer install --no-interaction --prefer-dist --no-suggest
-
+# Start out in a "this isn't a new install" mode
+freshInstall=false
 # If no environment file is found copy the example one and then generate the key.
+if [ ! -f ".env" ]; then
+	cp .env.example .env
+fi
+
+# Force this into local/debug mode
+sed -i "s/APP_ENV=.*/APP_ENV=local/" .env
+sed -i "s/APP_DEBUG=.*/APP_DEBUG=true/" .env
+
+composer install --no-interaction --prefer-dist --no-suggest --no-scripts
+php artisan config:clear
 
 # Configure the cronjob
 (crontab -l 2>/dev/null; echo "* * * * * php /srv/www/artisan schedule:run >> /dev/null 2>&1") | crontab -
@@ -45,7 +56,7 @@ systemctl enable pteroq.service
 systemctl start pteroq
 
 # Create symlink
-rm /home/vagrant/app
+rm -f /home/vagrant/app
 ln -s /srv/www /home/vagrant/app
 
 # Configure OPCache
