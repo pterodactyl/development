@@ -34,10 +34,6 @@ Vagrant.configure("2") do |config|
 			vb.cpus = 2
 
 			vb.customize ["storagectl", :id, "--name", "SATA Controller", "--hostiocache", "on"]
-    		vb.customize ["modifyvm", :id, "--nictype1", "virtio"]
-    		vb.customize ["modifyvm", :id, "--nictype2", "virtio"]
-    		vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
-    		vb.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
     		vb.customize ["modifyvm", :id, "--ioapic", "on"]
 		end
 
