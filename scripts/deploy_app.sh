@@ -74,6 +74,7 @@ EOF
 cat >> /etc/php/7.2/fpm/conf.d/20-xdebug.ini <<EOF
 xdebug.remote_enable=1
 xdebug.profiler_enable=1
+xdebug.remote_host=host.pterodactyl.local
 EOF
 
 # Install development dependencies
