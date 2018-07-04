@@ -1,7 +1,7 @@
 
 ["vagrant-vbguest", "vagrant-hostmanager"].each do |plugin|
     unless Vagrant.has_plugin?(plugin)
-      raise plugin + ' plugin is not installed. Hint: vagrant plugin install ' + plugin
+      raise plugin + " plugin is not installed. Hint: vagrant plugin install " + plugin
     end
 end
 
@@ -15,26 +15,30 @@ Vagrant.configure("2") do |config|
 	# config.vm.network "private_network", ip: "192.168.10.1", virtualbox__intnet: true
 
 	config.vm.define "app", primary: true do |app|
-		app.vm.hostname = 'app'
-		app.vm.box = 'bento/ubuntu-16.04'
+		app.vm.hostname = "app"
+		app.vm.box = "bento/ubuntu-16.04"
 		app.vm.box_check_update = true
 
 		app.vm.synced_folder ".", "/vagrant", disabled: true
-		app.vm.synced_folder "code/panel", "/srv/www", type: "nfs"
+		app.vm.synced_folder "code/panel", "/srv/www", type: "nfs",
+			mount_options: ["rw", "vers=3", "tcp", "fsc" ,"actimeo=1"]
+			linux__nfs_options: ["rw", "no_subtree_check", "all_squash", "async"]
 
 		app.vm.network "forwarded_port", guest: 80, host: 80
 		app.vm.network :private_network, ip: "192.168.10.10"
 		app.hostmanager.aliases = %w(pterodactyl.local)
 
-		app.vm.provider "virtualbox" do |box|
-			box.gui = false
-			box.memory = 1024
-			box.cpus = 2
-			box.customize [
-        		"storagectl", :id,
-        		"--name", "SATA Controller",
-        		"--hostiocache", "on"
-    		]
+		app.vm.provider :virtualbox do |vb|
+			vb.gui = false
+			vb.memory = 1024
+			vb.cpus = 2
+
+			vb.customize ["storagectl", :id, "--name", "SATA Controller", "--hostiocache", "on"]
+    		vb.customize ["modifyvm", :id, "--nictype1", "virtio"]
+    		vb.customize ["modifyvm", :id, "--nictype2", "virtio"]
+    		vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+    		vb.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
+    		vb.customize ["modifyvm", :id, "--ioapic", "on"]
 		end
 
 		app.vm.provision :shell, run: "once", inline: <<-SHELL
@@ -76,7 +80,7 @@ EOF
 
 	# Configure a mysql docker container.
 	config.vm.define "mysql" do |mysql|
-		mysql.vm.hostname = 'mysql'
+		mysql.vm.hostname = "mysql"
 		mysql.vm.synced_folder ".", "/vagrant", disabled: true
 		mysql.vm.synced_folder ".data/mysql", "/var/lib/mysql", create: true
 
@@ -108,7 +112,7 @@ EOF
 	# Create a docker container for mailhog which providers a local SMTP environment that avoids actually
 	# sending emails to the address.
 	config.vm.define "mailhog" do |mh|
-		mh.vm.hostname = 'mailhog'
+		mh.vm.hostname = "mailhog"
 		mh.vm.synced_folder ".", "/vagrant", disabled: true
 
 		mh.vm.network "forwarded_port", guest: 1025, host: 1025
