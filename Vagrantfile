@@ -1,5 +1,4 @@
-
-["vagrant-vbguest", "vagrant-hostmanager"].each do |plugin|
+["vagrant-notify-forwarder", "vagrant-vbguest", "vagrant-hostmanager"].each do |plugin|
     unless Vagrant.has_plugin?(plugin)
       raise plugin + " plugin is not installed. Hint: vagrant plugin install " + plugin
     end
