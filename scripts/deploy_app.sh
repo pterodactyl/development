@@ -22,7 +22,10 @@ apt -y install software-properties-common \
 	curl \
 	tar \
 	unzip \
-	git
+	git \
+	cachefilesd
+
+sudo echo "RUN=yes" > /etc/default/cachefilesd
 
 # Install yarn and NodeJS for development purposes.
 curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
