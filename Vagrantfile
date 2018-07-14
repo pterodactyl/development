@@ -9,7 +9,7 @@ vagrant_root = File.dirname(__FILE__)
 Vagrant.configure("2") do |config|
 	config.hostmanager.enabled = true
 	config.hostmanager.manage_host = true
-	config.hostmanager.manage_guest = true
+	config.hostmanager.manage_guest = false
 	config.hostmanager.ignore_private_ip = false
 	config.hostmanager.include_offline = true
 
@@ -30,29 +30,15 @@ Vagrant.configure("2") do |config|
 
 		app.vm.provider "docker" do |d|
 			d.image = "quay.io/pterodactyl/vagrant-panel"
-			d.create_args = ["-it"]
+			d.create_args = ["-it", "--add-host=host.pterodactyl.local:172.18.0.1"]
 			d.ports = ["80:80", "8080:8080", "8081:8081"]
 			d.volumes = ["#{vagrant_root}/code/panel:/srv/www:cached"]
 			d.remains_running = true
 			d.has_ssh = true
 		end
 
-		app.vm.provision :file, source: "build/configs", destination: "/tmp/.deploy"
-
-		app.vm.provision :shell, run: "once", inline: <<-SHELL
-cat >> /etc/hosts <<EOF
-
-# Vagrant
-192.168.10.1 host
-192.168.10.1 host.pterodactyl.local
-# End Vagrant
-
-192.168.1.202 services.pterodactyl.local
-EOF
-		SHELL
-
-		app.vm.provision :shell, path: "scripts/deploy_app.sh"
-
+		app.vm.provision "deploy_files", type: "file", source: "build/configs", destination: "/tmp/.deploy"
+		app.vm.provision "configure_application", type: "shell", path: "scripts/deploy_app.sh"
 		app.vm.provision "setup", type: "shell", run: "never", inline: <<-SHELL
 			cd /srv/www
 
