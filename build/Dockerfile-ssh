@@ -1,7 +1,6 @@
 FROM ubuntu:16.04
 
 LABEL maintainer="dane@daneeveritt.com" \
-	  tag_with="ssh" \
 	  description="Base image used by Pterodactyl's development environments to provide SSH support for vagrant."
 
 ENV DEBIAN_FRONTEND=noninteractive \
@@ -9,7 +8,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
 
 RUN apt -y update \
 	&& apt -y upgrade \
-	&& apt -y --no-install-recommends install software-properties-common sudo openssh-server locales \
+	&& apt -y --no-install-recommends install software-properties-common sudo openssh-server locales curl \
 	&& sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen \
 	&& locale-gen
 
