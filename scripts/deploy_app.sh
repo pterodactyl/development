@@ -1,39 +1,11 @@
 #!/bin/bash
 export DEBIAN_FRONTEND=noninteractive
 
-# Install the dependencies for core software.
-add-apt-repository -y ppa:ondrej/php
-apt -y update && apt -y upgrade
-apt -y install software-properties-common \
-	php7.2 \
-	php7.2-cli \
-	php7.2-gd \
-	php7.2-mysql \
-	php7.2-pdo \
-	php7.2-mbstring \
-	php7.2-tokenizer \
-	php7.2-bcmath \
-	php7.2-xml \
-	php7.2-fpm \
-	php7.2-curl \
-	php7.2-zip \
-	php7.2-xdebug \
-	nginx \
-	curl \
-	tar \
-	unzip \
-	git \
-	cachefilesd
+cp /tmp/.deploy/pterodactyl.conf /etc/supervisor/conf.d/pterodactyl.conf
+cp /tmp/.deploy/pterodactyl.local.conf /etc/nginx/sites-available/pterodactyl.local.conf
 
-sudo echo "RUN=yes" > /etc/default/cachefilesd
-
-# Install yarn and NodeJS for development purposes.
-curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
-curl -sL https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
-echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
-apt -y update && apt -y install nodejs yarn
-
-curl -sS https://getcomposer.org/installer | sudo php -- --install-dir=/usr/local/bin --filename=composer
+# Needed for FPM to start correctly.
+mkdir -p /run/php
 
 cd /srv/www
 chmod -R 755 storage/* bootstrap/cache
@@ -55,13 +27,9 @@ php artisan config:clear
 # Configure the cronjob
 (crontab -l 2>/dev/null; echo "* * * * * php /srv/www/artisan schedule:run >> /dev/null 2>&1") | crontab -
 
-# Configure the process worker
-systemctl enable pteroq.service
-systemctl start pteroq
-
 # Create symlink
-rm -f /home/vagrant/app
-ln -s /srv/www /home/vagrant/app
+rm -f /root/app
+ln -s /srv/www /root/app
 
 # Configure OPCache
 cat >> /etc/php/7.2/cli/conf.d/10-opcache.ini <<EOF
@@ -87,5 +55,9 @@ yarn install --no-progress
 rm -rfv /var/www
 rm -rv /etc/nginx/sites-enabled/*
 ln -s /etc/nginx/sites-available/pterodactyl.local.conf /etc/nginx/sites-enabled/pterodactyl.local.conf
-service php7.2-fpm restart
-service nginx restart
+
+# Start processes
+supervisorctl reread
+supervisorctl update
+supervisorctl start pteroq:*
+supervisorctl restart nginx

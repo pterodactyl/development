@@ -1,8 +1,10 @@
-["vagrant-notify-forwarder", "vagrant-vbguest", "vagrant-hostmanager"].each do |plugin|
+["vagrant-vbguest", "vagrant-hostmanager"].each do |plugin|
     unless Vagrant.has_plugin?(plugin)
       raise plugin + " plugin is not installed. Hint: vagrant plugin install " + plugin
     end
 end
+
+vagrant_root = File.dirname(__FILE__)
 
 Vagrant.configure("2") do |config|
 	config.hostmanager.enabled = true
@@ -11,29 +13,30 @@ Vagrant.configure("2") do |config|
 	config.hostmanager.ignore_private_ip = false
 	config.hostmanager.include_offline = true
 
-	# config.vm.network "private_network", ip: "192.168.10.1", virtualbox__intnet: true
-
 	config.vm.define "app", primary: true do |app|
 		app.vm.hostname = "app"
-		app.vm.box = "bento/ubuntu-16.04"
-		app.vm.box_check_update = true
 
 		app.vm.synced_folder ".", "/vagrant", disabled: true
-		app.vm.synced_folder "code/panel", "/srv/www", type: "nfs",
-			mount_options: ["rw", "vers=3", "tcp", "fsc"]
 
-		app.vm.network "forwarded_port", guest: 80, host: 80
-		app.vm.network :private_network, ip: "192.168.10.10"
 		app.hostmanager.aliases = %w(pterodactyl.local)
 
-		app.vm.provider :virtualbox do |vb|
-			vb.gui = false
-			vb.memory = 1024
-			vb.cpus = 2
+		app.vm.network "forwarded_port", guest: 80, host: 80
+		app.vm.network "forwarded_port", guest: 8080, host: 8080
 
-			vb.customize ["storagectl", :id, "--name", "SATA Controller", "--hostiocache", "on"]
-    		vb.customize ["modifyvm", :id, "--ioapic", "on"]
+		app.ssh.insert_key = true
+		app.ssh.username = "root"
+		app.ssh.password = "vagrant"
+
+		app.vm.provider "docker" do |d|
+			d.image = "quay.io/pterodactyl/vagrant-panel"
+			d.create_args = ["-it"]
+			d.volumes = ["#{vagrant_root}/code/panel:/srv/www:cached"]
+			# d.ports = ["80:80", "8080:8080"]
+			d.remains_running = true
+			d.has_ssh = true
 		end
+
+		app.vm.provision :file, source: "build/configs", destination: "/tmp/.deploy"
 
 		app.vm.provision :shell, run: "once", inline: <<-SHELL
 cat >> /etc/hosts <<EOF
@@ -45,15 +48,6 @@ cat >> /etc/hosts <<EOF
 
 192.168.1.202 services.pterodactyl.local
 EOF
-		SHELL
-
-		app.vm.provision "file", source: "scripts/configs/pteroq.service", destination: "/tmp/.deploy/pteroq.service"
-		app.vm.provision "file", source: "scripts/configs/pterodactyl.local.conf", destination: "/tmp/.deploy/pterodactyl.local.conf"
-
-		app.vm.provision :shell, inline: <<-SHELL
-			mv /tmp/.deploy/pteroq.service /etc/systemd/system/pteroq.service
-			mv /tmp/.deploy/pterodactyl.local.conf /etc/nginx/sites-available/pterodactyl.local.conf
-			rm -r /tmp/.deploy
 		SHELL
 
 		app.vm.provision :shell, path: "scripts/deploy_app.sh"
@@ -79,7 +73,6 @@ EOF
 		mysql.vm.synced_folder ".data/mysql", "/var/lib/mysql", create: true
 
 		mysql.vm.network "forwarded_port", guest: 3306, host: 3306
-		mysql.vm.network :private_network, ip: "192.168.10.11"
 		mysql.hostmanager.aliases = %w(mysql.pterodactyl.local)
 
 		mysql.vm.provider "docker" do |d|
@@ -111,7 +104,6 @@ EOF
 
 		mh.vm.network "forwarded_port", guest: 1025, host: 1025
 		mh.vm.network "forwarded_port", guest: 8025, host: 8025
-		mh.vm.network :private_network, ip: "192.168.10.12"
 		mh.hostmanager.aliases = %w(mailhog.pterodactyl.local)
 
 		mh.vm.provider "docker" do |d|
@@ -127,7 +119,6 @@ EOF
 		redis.vm.synced_folder ".", "/vagrant", disabled: true
 
 		redis.vm.network "forwarded_port", guest: 6379, host: 6379
-		redis.vm.network :private_network, ip: "192.168.10.13"
 		redis.hostmanager.aliases = %w(redis.pterodactyl.local)
 
 		redis.vm.provision :hostmanager
