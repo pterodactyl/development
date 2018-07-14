@@ -22,6 +22,7 @@ Vagrant.configure("2") do |config|
 
 		app.vm.network "forwarded_port", guest: 80, host: 80
 		app.vm.network "forwarded_port", guest: 8080, host: 8080
+		app.vm.network "forwarded_port", guest: 8081, host: 8081
 
 		app.ssh.insert_key = true
 		app.ssh.username = "root"
@@ -30,8 +31,8 @@ Vagrant.configure("2") do |config|
 		app.vm.provider "docker" do |d|
 			d.image = "quay.io/pterodactyl/vagrant-panel"
 			d.create_args = ["-it"]
+			d.ports = ["80:80", "8080:8080", "8081:8081"]
 			d.volumes = ["#{vagrant_root}/code/panel:/srv/www:cached"]
-			# d.ports = ["80:80", "8080:8080"]
 			d.remains_running = true
 			d.has_ssh = true
 		end
