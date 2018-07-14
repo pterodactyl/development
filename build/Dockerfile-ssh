@@ -1,6 +1,7 @@
 FROM ubuntu:16.04
 
 LABEL maintainer="dane@daneeveritt.com" \
+	  tag_with="ssh" \
 	  description="Base image used by Pterodactyl's development environments to provide SSH support for vagrant."
 
 ENV DEBIAN_FRONTEND=noninteractive \
