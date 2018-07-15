@@ -7,6 +7,9 @@ cp /tmp/.deploy/pterodactyl.local.conf /etc/nginx/sites-available/pterodactyl.lo
 # Needed for FPM to start correctly.
 mkdir -p /run/php
 
+# Disable xdebug on the CLI for _MASSIVE_ performance improvement
+phpdismod -s cli xdebug
+
 cd /srv/www
 chmod -R 755 storage/* bootstrap/cache
 
@@ -21,7 +24,7 @@ fi
 sed -i "s/APP_ENV=.*/APP_ENV=local/" .env
 sed -i "s/APP_DEBUG=.*/APP_DEBUG=true/" .env
 
-composer install --no-interaction --prefer-dist --no-suggest --no-scripts
+composer install --no-interaction --prefer-dist --no-suggest --no-scripts --no-progress
 php artisan config:clear
 
 # Configure the cronjob

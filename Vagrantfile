@@ -32,7 +32,13 @@ Vagrant.configure("2") do |config|
 			d.image = "quay.io/pterodactyl/vagrant-panel"
 			d.create_args = ["-it", "--add-host=host.pterodactyl.local:172.18.0.1"]
 			d.ports = ["80:80", "8080:8080", "8081:8081"]
-			d.volumes = ["#{vagrant_root}/code/panel:/srv/www:cached"]
+
+			if ENV['FILE_SYNC_METHOD'] === 'docker-sync'
+				d.volumes = ["panel-sync:/srv/www:nocopy"]
+			else
+				d.volumes = ["#{vagrant_root}/code/panel:/srv/www:cached"]
+			end
+
 			d.remains_running = true
 			d.has_ssh = true
 		end
