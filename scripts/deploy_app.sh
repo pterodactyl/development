@@ -12,6 +12,7 @@ phpdismod -s cli xdebug
 
 cd /srv/www
 chmod -R 755 storage/* bootstrap/cache
+chown -R www-data:www-data storage
 
 # Start out in a "this isn't a new install" mode
 freshInstall=false

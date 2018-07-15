@@ -30,7 +30,7 @@ Vagrant.configure("2") do |config|
 
 		app.vm.provider "docker" do |d|
 			d.image = "quay.io/pterodactyl/vagrant-panel"
-			d.create_args = ["-it", "--add-host=host.pterodactyl.local:172.18.0.1"]
+			d.create_args = ["-it", "--add-host=host.pterodactyl.local:172.17.0.1"]
 			d.ports = ["80:80", "8080:8080", "8081:8081"]
 
 			if ENV['FILE_SYNC_METHOD'] === 'docker-sync'
@@ -85,6 +85,22 @@ Vagrant.configure("2") do |config|
 				"MYSQL_USER": "pterodactyl",
 				"MYSQL_PASSWORD": "pterodactyl"
 			}
+			d.remains_running = true
+		end
+	end
+
+	config.vm.define "chromedriver" do |chrome|
+		chrome.vm.hostname = "chromedriver"
+		chrome.vm.synced_folder ".", "/vagrant", disabled: true
+
+		chrome.vm.network "forwarded_port", guest: 4444, host: 4444
+		chrome.vm.network "forwarded_port", guest: 5900, host: 5900
+		chrome.hostmanager.aliases = %w(chrome.pterodactyl.local)
+
+		chrome.vm.provider "docker" do |d|
+			d.image = "selenium/standalone-chrome-debug:3.12.0-boron"
+			d.ports = ["5900:5900", "4444:4444"]
+			d.create_args = ["--add-host=pterodactyl.local:172.17.0.1"]
 			d.remains_running = true
 		end
 	end
