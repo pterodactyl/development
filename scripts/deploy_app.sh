@@ -19,7 +19,6 @@ freshInstall=false
 # If no environment file is found copy the example one and then generate the key.
 if [ ! -f ".env" ]; then
 	cp .env.example .env
-	php artisan key:generate --force
 fi
 
 # Force this into local/debug mode
