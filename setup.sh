@@ -1,6 +1,6 @@
 #!/bin/bash
 
-currentDirectory=$(cwd)
+currentDirectory=$(pwd)
 cd /tmp
 
 vagrant plugin install vagrant-vbguest
