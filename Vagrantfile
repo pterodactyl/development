@@ -64,7 +64,8 @@ Vagrant.configure("2") do |config|
 		docs.vm.synced_folder ".", "/vagrant", disabled: true
 
 		docs.hostmanager.aliases = %w(pterodocs.local)
-		docs.vm.network "forwarded_port", guest: 80, host: 8088
+		docs.vm.network "forwarded_port", guest: 80, host: 9090
+		docs.vm.network "forwarded_port", guest: 9091, host: 9091
 
 		docs.ssh.insert_key = true
 		docs.ssh.username = "root"
@@ -73,7 +74,7 @@ Vagrant.configure("2") do |config|
 		docs.vm.provider "docker" do |d|
 			d.image = "quay.io/pterodactyl/vagrant-core"
 			d.create_args = ["-it", "--add-host=host.pterodactyl.local:172.17.0.1"]
-			d.ports = ["8088:80"]
+			d.ports = ["8088:80", "9091:9091"]
 			d.volumes = ["#{vagrant_root}/code/documentation:/srv/documentation:cached"]
 			d.remains_running = true
 			d.has_ssh = true
