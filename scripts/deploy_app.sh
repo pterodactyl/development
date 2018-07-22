@@ -1,8 +1,8 @@
 #!/bin/bash
 export DEBIAN_FRONTEND=noninteractive
 
-cp /tmp/.deploy/pterodactyl.conf /etc/supervisor/conf.d/pterodactyl.conf
-cp /tmp/.deploy/pterodactyl.local.conf /etc/nginx/sites-available/pterodactyl.local.conf
+cp /tmp/.deploy/supervisor/pterodactyl.conf /etc/supervisor/conf.d/pterodactyl.conf
+cp /tmp/.deploy/nginx/pterodactyl.local.conf /etc/nginx/sites-available/pterodactyl.local.conf
 
 # Needed for FPM to start correctly.
 mkdir -p /run/php
