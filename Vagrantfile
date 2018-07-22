@@ -43,8 +43,8 @@ Vagrant.configure("2") do |config|
 			d.has_ssh = true
 		end
 
-		app.vm.provision "deploy_files", type: "file", source: "build/configs", destination: "/tmp/.deploy"
-		app.vm.provision "configure_application", type: "shell", path: "scripts/deploy_app.sh"
+		app.vm.provision "deploy_files", type: "file", source: "#{vagrant_root}/build/configs", destination: "/tmp/.deploy"
+		app.vm.provision "configure_application", type: "shell", path: "#{vagrant_root}/scripts/deploy_app.sh"
 		app.vm.provision "setup", type: "shell", run: "never", inline: <<-SHELL
 			cd /srv/www
 
