@@ -74,7 +74,7 @@ Vagrant.configure("2") do |config|
 		docs.vm.provider "docker" do |d|
 			d.image = "quay.io/pterodactyl/vagrant-core"
 			d.create_args = ["-it", "--add-host=host.pterodactyl.local:172.17.0.1"]
-			d.ports = ["8088:80", "9091:9091"]
+			d.ports = ["9090:80", "9091:9091"]
 			d.volumes = ["#{vagrant_root}/code/documentation:/srv/documentation:cached"]
 			d.remains_running = true
 			d.has_ssh = true
