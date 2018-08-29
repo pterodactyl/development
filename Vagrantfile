@@ -59,7 +59,7 @@ Vagrant.configure("2") do |config|
 		SHELL
 	end
 
-	config.vm.define "wings" do |wings|
+	config.vm.define "wings", autostart: false do |wings|
 		wings.vm.hostname = "wings"
 	
 		wings.vm.box = "bento/ubuntu-18.04"
