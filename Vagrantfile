@@ -59,6 +59,21 @@ Vagrant.configure("2") do |config|
 		SHELL
 	end
 
+	config.vm.define "wings" do |wings|
+		wings.vm.hostname = "wings"
+	
+		wings.vm.box = "bento/ubuntu-18.04"
+
+		wings.vm.synced_folder ".", "/vagrant", disabled: true
+		wings.vm.synced_folder "#{vagrant_root}/code/wings", "/home/vagrant/go/src/github.com/pterodactyl/wings",
+			owner: "vagrant", group: "vagrant"
+
+		wings.vm.network :forwarded_port, guest: 8080, host: 58080
+		wings.hostmanager.aliases = %w(wings.local)
+
+		wings.vm.provision "provision", type: "shell", path: "#{vagrant_root}/scripts/provision_wings.sh"
+	end
+
 	config.vm.define "docs" do |docs|
 		docs.vm.hostname = "documentation"
 		docs.vm.synced_folder ".", "/vagrant", disabled: true
@@ -78,6 +93,7 @@ Vagrant.configure("2") do |config|
 			d.volumes = ["#{vagrant_root}/code/documentation:/srv/documentation:cached"]
 			d.remains_running = true
 			d.has_ssh = true
+			d.privileged = true
 		end
 
 		docs.vm.provision "deploy_files", type: "file", source: "#{vagrant_root}/build/configs", destination: "/tmp/.deploy"
