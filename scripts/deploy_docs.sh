@@ -10,7 +10,7 @@ apt install -y --no-install-recommends nginx nodejs yarn supervisor
 
 # Copy over deployment specific files.
 cp /tmp/.deploy/supervisor/pterodocs.conf /etc/supervisor/conf.d/pterodocs.conf
-cp /tmp/.deploy/nginx/pterodocs.local.conf /etc/nginx/sites-available/pterodocs.local.conf
+cp /tmp/.deploy/nginx/pterodocs.test.conf /etc/nginx/sites-available/pterodocs.test.conf
 
 cd /srv/documentation
 yarn add vuepress
@@ -21,7 +21,7 @@ ln -s /srv/documentation ~/docs
 # Configure and restart nginx
 rm -rfv /var/www
 rm -rfv /etc/nginx/sites-enabled/*
-ln -s /etc/nginx/sites-available/pterodocs.local.conf /etc/nginx/sites-enabled/pterodocs.local.conf
+ln -s /etc/nginx/sites-available/pterodocs.test.conf /etc/nginx/sites-enabled/pterodocs.test.conf
 
 supervisorctl reread
 supervisorctl update
