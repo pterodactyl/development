@@ -18,7 +18,7 @@ Vagrant.configure("2") do |config|
 
 		app.vm.synced_folder ".", "/vagrant", disabled: true
 
-		app.hostmanager.aliases = %w(pterodactyl.local)
+		app.hostmanager.aliases = %w(pterodactyl.test)
 
 		app.vm.network "forwarded_port", guest: 80, host: 80
 		app.vm.network "forwarded_port", guest: 8080, host: 8080
@@ -30,7 +30,7 @@ Vagrant.configure("2") do |config|
 
 		app.vm.provider "docker" do |d|
 			d.image = "quay.io/pterodactyl/vagrant-panel"
-			d.create_args = ["-it", "--add-host=host.pterodactyl.local:172.17.0.1"]
+			d.create_args = ["-it", "--add-host=host.pterodactyl.test:172.17.0.1"]
 			d.ports = ["80:80", "8080:8080", "8081:8081"]
 
 			if ENV['FILE_SYNC_METHOD'] === 'docker-sync'
@@ -51,9 +51,9 @@ Vagrant.configure("2") do |config|
 			cp .env .env.bkup
 			php artisan key:generate --force --no-interaction
 
-			php artisan p:environment:setup --new-salt --author="you@example.com" --url="http://pterodactyl.local" --timezone="America/Los_Angeles" --cache=redis --session=redis --queue=redis --redis-host="host.pterodactyl.local" --no-interaction
-			php artisan p:environment:database --host="host.pterodactyl.local" --database=panel --username=pterodactyl --password=pterodactyl --no-interaction
-			php artisan p:environment:mail --driver=smtp --email="outgoing@example.com" --from="Pterodactyl Panel" --host="host.pterodactyl.local" --port=1025 --no-interaction
+			php artisan p:environment:setup --new-salt --author="you@example.com" --url="http://pterodactyl.test" --timezone="America/Los_Angeles" --cache=redis --session=redis --queue=redis --redis-host="host.pterodactyl.test" --no-interaction
+			php artisan p:environment:database --host="host.pterodactyl.test" --database=panel --username=pterodactyl --password=pterodactyl --no-interaction
+			php artisan p:environment:mail --driver=smtp --email="outgoing@example.com" --from="Pterodactyl Panel" --host="host.pterodactyl.test" --port=1025 --no-interaction
 
 			php artisan migrate --seed
 		SHELL
@@ -69,7 +69,7 @@ Vagrant.configure("2") do |config|
 			owner: "vagrant", group: "vagrant"
 
 		wings.vm.network :forwarded_port, guest: 8080, host: 58080
-		wings.hostmanager.aliases = %w(wings.local)
+		wings.hostmanager.aliases = %w(wings.test)
 
 		wings.vm.provision "provision", type: "shell", path: "#{vagrant_root}/scripts/provision_wings.sh"
 	end
@@ -78,7 +78,7 @@ Vagrant.configure("2") do |config|
 		docs.vm.hostname = "documentation"
 		docs.vm.synced_folder ".", "/vagrant", disabled: true
 
-		docs.hostmanager.aliases = %w(pterodocs.local)
+		docs.hostmanager.aliases = %w(pterodocs.test)
 		docs.vm.network "forwarded_port", guest: 80, host: 9090
 		docs.vm.network "forwarded_port", guest: 9091, host: 9091
 
@@ -88,7 +88,7 @@ Vagrant.configure("2") do |config|
 
 		docs.vm.provider "docker" do |d|
 			d.image = "quay.io/pterodactyl/vagrant-core"
-			d.create_args = ["-it", "--add-host=host.pterodactyl.local:172.17.0.1"]
+			d.create_args = ["-it", "--add-host=host.pterodactyl.test:172.17.0.1"]
 			d.ports = ["9090:80", "9091:9091"]
 			d.volumes = ["#{vagrant_root}/code/documentation:/srv/documentation:cached"]
 			d.remains_running = true
@@ -108,7 +108,7 @@ Vagrant.configure("2") do |config|
 		mysql.vm.synced_folder ".data/mysql", "/var/lib/mysql", create: true
 
 		mysql.vm.network "forwarded_port", guest: 3306, host: 3306
-		mysql.hostmanager.aliases = %w(mysql.pterodactyl.local)
+		mysql.hostmanager.aliases = %w(mysql.pterodactyl.test)
 
 		mysql.vm.provider "docker" do |d|
 			d.image = "mysql:5.7"
@@ -137,12 +137,12 @@ Vagrant.configure("2") do |config|
 
 		chrome.vm.network "forwarded_port", guest: 4444, host: 4444
 		chrome.vm.network "forwarded_port", guest: 5900, host: 5900
-		chrome.hostmanager.aliases = %w(chrome.pterodactyl.local)
+		chrome.hostmanager.aliases = %w(chrome.pterodactyl.test)
 
 		chrome.vm.provider "docker" do |d|
 			d.image = "selenium/standalone-chrome-debug:3.12.0-boron"
 			d.ports = ["5900:5900", "4444:4444"]
-			d.create_args = ["--add-host=pterodactyl.local:172.17.0.1"]
+			d.create_args = ["--add-host=pterodactyl.test:172.17.0.1"]
 			d.remains_running = true
 		end
 	end
@@ -155,7 +155,7 @@ Vagrant.configure("2") do |config|
 
 		mh.vm.network "forwarded_port", guest: 1025, host: 1025
 		mh.vm.network "forwarded_port", guest: 8025, host: 8025
-		mh.hostmanager.aliases = %w(mailhog.pterodactyl.local)
+		mh.hostmanager.aliases = %w(mailhog.pterodactyl.test)
 
 		mh.vm.provider "docker" do |d|
 			d.image = "mailhog/mailhog"
@@ -170,7 +170,7 @@ Vagrant.configure("2") do |config|
 		redis.vm.synced_folder ".", "/vagrant", disabled: true
 
 		redis.vm.network "forwarded_port", guest: 6379, host: 6379
-		redis.hostmanager.aliases = %w(redis.pterodactyl.local)
+		redis.hostmanager.aliases = %w(redis.pterodactyl.test)
 
 		redis.vm.provision :hostmanager
 

@@ -2,7 +2,7 @@
 export DEBIAN_FRONTEND=noninteractive
 
 cp /tmp/.deploy/supervisor/pterodactyl.conf /etc/supervisor/conf.d/pterodactyl.conf
-cp /tmp/.deploy/nginx/pterodactyl.local.conf /etc/nginx/sites-available/pterodactyl.local.conf
+cp /tmp/.deploy/nginx/pterodactyl.test.conf /etc/nginx/sites-available/pterodactyl.test.conf
 
 # Needed for FPM to start correctly.
 mkdir -p /run/php
@@ -49,7 +49,7 @@ EOF
 cat >> /etc/php/7.2/fpm/conf.d/20-xdebug.ini <<EOF
 xdebug.remote_enable=1
 xdebug.profiler_enable=1
-xdebug.remote_host=host.pterodactyl.local
+xdebug.remote_host=host.pterodactyl.test
 EOF
 
 # Install development dependencies
@@ -58,7 +58,7 @@ yarn install --no-progress
 # Cleanup
 rm -rfv /var/www
 rm -rv /etc/nginx/sites-enabled/*
-ln -s /etc/nginx/sites-available/pterodactyl.local.conf /etc/nginx/sites-enabled/pterodactyl.local.conf
+ln -s /etc/nginx/sites-available/pterodactyl.test.conf /etc/nginx/sites-enabled/pterodactyl.test.conf
 
 # Start processes
 supervisorctl reread
