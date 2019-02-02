@@ -74,6 +74,22 @@ Vagrant.configure("2") do |config|
 		wings.vm.provision "provision", type: "shell", path: "#{vagrant_root}/scripts/provision_wings.sh"
 	end
 
+	config.vm.define "daemon", autostart: false do |daemon|
+		daemon.vm.hostname = "daemon.pterodactyl.test"
+		daemon.vm.box = "bento/ubuntu-18.04"
+
+		daemon.vm.synced_folder ".", "/vagrant", disabled: true
+		daemon.vm.synced_folder "#{vagrant_root}/code/daemon", "/srv/daemon", owner: "vagrant", group: "vagrant"
+		daemon.vm.synced_folder "#{vagrant_root}/code/sftp-server", "/home/vagrant/go/src/github.com/pterodactyl/sftp-server", owner: "vagrant", group: "vagrant"
+		daemon.vm.synced_folder ".data/daemon-data", "/srv/daemon-data", create: true
+
+		daemon.vm.network :private_network, ip: "192.168.50.4"
+		daemon.vm.network :forwarded_port, guest: 8080, host: 58081
+		daemon.vm.network :forwarded_port, guest: 8022, host: 58022
+
+		daemon.vm.provision "provision", type: "shell", path: "#{vagrant_root}/scripts/provision_daemon.sh"
+	end
+
 	config.vm.define "docs" do |docs|
 		docs.vm.hostname = "documentation"
 		docs.vm.synced_folder ".", "/vagrant", disabled: true
