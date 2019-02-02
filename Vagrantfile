@@ -66,7 +66,6 @@ Vagrant.configure("2") do |config|
 			owner: "vagrant", group: "vagrant"
 
 		wings.vm.network :private_network, ip: "192.168.50.3"
-		wings.vm.network :forwarded_port, guest: 8080, host: 58080
 
 		wings.vm.provision "provision", type: "shell", path: "#{vagrant_root}/scripts/provision_wings.sh"
 	end
@@ -81,8 +80,6 @@ Vagrant.configure("2") do |config|
 		daemon.vm.synced_folder ".data/daemon-data", "/srv/daemon-data", create: true
 
 		daemon.vm.network :private_network, ip: "192.168.50.4"
-		daemon.vm.network :forwarded_port, guest: 8080, host: 58081
-		daemon.vm.network :forwarded_port, guest: 8022, host: 58022
 
 		daemon.vm.provision "provision", type: "shell", path: "#{vagrant_root}/scripts/provision_daemon.sh"
 	end
