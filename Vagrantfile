@@ -28,7 +28,8 @@ Vagrant.configure("2") do |config|
 
 		app.vm.provider "docker" do |d|
 			d.image = "quay.io/pterodactyl/vagrant-panel"
-			d.create_args = ["-it", "--add-host=host.pterodactyl.test:172.17.0.1"]
+			d.create_args = ["-it", "--add-host=host.pterodactyl.test:172.17.0.1", 
+				"--add-host=daemon.pterodactyl.test:192.168.50.4", "--add-host=wings.pterodactyl.test:192.168.50.3"]
 			d.ports = ["80:80", "8080:8080", "8081:8081"]
 
 			if ENV['FILE_SYNC_METHOD'] === 'docker-sync'
@@ -41,6 +42,7 @@ Vagrant.configure("2") do |config|
 			d.has_ssh = true
 		end
 
+		app.vm.provision :hostmanager
 		app.vm.provision "deploy_files", type: "file", source: "#{vagrant_root}/build/configs", destination: "/tmp/.deploy"
 		app.vm.provision "configure_application", type: "shell", path: "#{vagrant_root}/scripts/deploy_app.sh"
 		app.vm.provision "setup", type: "shell", run: "never", inline: <<-SHELL
