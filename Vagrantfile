@@ -78,7 +78,7 @@ Vagrant.configure("2") do |config|
 
 		daemon.vm.synced_folder ".", "/vagrant", disabled: true
 		daemon.vm.synced_folder "#{vagrant_root}/code/daemon", "/srv/daemon", owner: "vagrant", group: "vagrant"
-		daemon.vm.synced_folder "#{vagrant_root}/code/sftp-server", "/home/vagrant/go/src/github.com/pterodactyl/sftp-server", owner: "vagrant", group: "vagrant"
+		daemon.vm.synced_folder "#{vagrant_root}/code/sftp-server", "/home/vagrant/sftp-server", owner: "vagrant", group: "vagrant"
 		daemon.vm.synced_folder ".data/daemon-data", "/srv/daemon-data", create: true
 
 		daemon.vm.network :private_network, ip: "192.168.50.4"
