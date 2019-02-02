@@ -6,6 +6,7 @@ echo "Provisioning development environment for Pterodactyl Panel."
 echo "Add repositories"
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add - > /dev/null
 add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" > /dev/null
+add-apt-repository -y ppa:longsleep/golang-backports > /dev/null
 curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash - > /dev/null
 curl -sL https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
 echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
