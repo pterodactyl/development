@@ -60,16 +60,15 @@ Vagrant.configure("2") do |config|
 	end
 
 	config.vm.define "wings", autostart: false do |wings|
-		wings.vm.hostname = "wings"
-	
+		wings.vm.hostname = "wings.pterodactyl.test"
 		wings.vm.box = "bento/ubuntu-18.04"
 
 		wings.vm.synced_folder ".", "/vagrant", disabled: true
 		wings.vm.synced_folder "#{vagrant_root}/code/wings", "/home/vagrant/go/src/github.com/pterodactyl/wings",
 			owner: "vagrant", group: "vagrant"
 
+		wings.vm.network :private_network, ip: "192.168.50.3"
 		wings.vm.network :forwarded_port, guest: 8080, host: 58080
-		wings.hostmanager.aliases = %w(wings.test)
 
 		wings.vm.provision "provision", type: "shell", path: "#{vagrant_root}/scripts/provision_wings.sh"
 	end
