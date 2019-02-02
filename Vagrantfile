@@ -157,7 +157,7 @@ Vagrant.configure("2") do |config|
 	# Create a docker container for mailhog which providers a local SMTP environment that avoids actually
 	# sending emails to the address.
 	config.vm.define "mailhog" do |mh|
-		mh.vm.hostname = "mailhog"
+		mh.vm.hostname = "mailhog.pterodactl.test"
 		mh.vm.synced_folder ".", "/vagrant", disabled: true
 
 		mh.vm.network "forwarded_port", guest: 1025, host: 1025
