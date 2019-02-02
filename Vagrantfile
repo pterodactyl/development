@@ -7,18 +7,16 @@ end
 vagrant_root = File.dirname(__FILE__)
 
 Vagrant.configure("2") do |config|
-	config.hostmanager.enabled = true
+	config.hostmanager.enabled = false
 	config.hostmanager.manage_host = true
 	config.hostmanager.manage_guest = false
 	config.hostmanager.ignore_private_ip = false
 	config.hostmanager.include_offline = true
 
 	config.vm.define "app", primary: true do |app|
-		app.vm.hostname = "app"
+		app.vm.hostname = "pterodactyl.test"
 
 		app.vm.synced_folder ".", "/vagrant", disabled: true
-
-		app.hostmanager.aliases = %w(pterodactyl.test)
 
 		app.vm.network "forwarded_port", guest: 80, host: 80
 		app.vm.network "forwarded_port", guest: 8080, host: 8080
@@ -90,10 +88,9 @@ Vagrant.configure("2") do |config|
 	end
 
 	config.vm.define "docs" do |docs|
-		docs.vm.hostname = "documentation"
+		docs.vm.hostname = "docs.pterodactyl.test"
 		docs.vm.synced_folder ".", "/vagrant", disabled: true
 
-		docs.hostmanager.aliases = %w(pterodocs.test)
 		docs.vm.network "forwarded_port", guest: 80, host: 9090
 		docs.vm.network "forwarded_port", guest: 9091, host: 9091
 
@@ -118,12 +115,11 @@ Vagrant.configure("2") do |config|
 
 	# Configure a mysql docker container.
 	config.vm.define "mysql" do |mysql|
-		mysql.vm.hostname = "mysql"
+		mysql.vm.hostname = "mysql.pterodactyl.test"
 		mysql.vm.synced_folder ".", "/vagrant", disabled: true
 		mysql.vm.synced_folder ".data/mysql", "/var/lib/mysql", create: true
 
 		mysql.vm.network "forwarded_port", guest: 3306, host: 3306
-		mysql.hostmanager.aliases = %w(mysql.pterodactyl.test)
 
 		mysql.vm.provider "docker" do |d|
 			d.image = "mysql:5.7"
@@ -147,12 +143,11 @@ Vagrant.configure("2") do |config|
 	end
 
 	config.vm.define "chromedriver" do |chrome|
-		chrome.vm.hostname = "chromedriver"
+		chrome.vm.hostname = "chromedriver.pterodactyl.test"
 		chrome.vm.synced_folder ".", "/vagrant", disabled: true
 
 		chrome.vm.network "forwarded_port", guest: 4444, host: 4444
 		chrome.vm.network "forwarded_port", guest: 5900, host: 5900
-		chrome.hostmanager.aliases = %w(chrome.pterodactyl.test)
 
 		chrome.vm.provider "docker" do |d|
 			d.image = "selenium/standalone-chrome-debug:3.12.0-boron"
@@ -170,7 +165,6 @@ Vagrant.configure("2") do |config|
 
 		mh.vm.network "forwarded_port", guest: 1025, host: 1025
 		mh.vm.network "forwarded_port", guest: 8025, host: 8025
-		mh.hostmanager.aliases = %w(mailhog.pterodactyl.test)
 
 		mh.vm.provider "docker" do |d|
 			d.image = "mailhog/mailhog"
@@ -181,13 +175,10 @@ Vagrant.configure("2") do |config|
 
 	# Create a docker container for the redis server.
 	config.vm.define "redis" do |redis|
-		redis.vm.hostname = "redis"
+		redis.vm.hostname = "redis.pterodactyl.test"
 		redis.vm.synced_folder ".", "/vagrant", disabled: true
 
 		redis.vm.network "forwarded_port", guest: 6379, host: 6379
-		redis.hostmanager.aliases = %w(redis.pterodactyl.test)
-
-		redis.vm.provision :hostmanager
 
 		redis.vm.provider "docker" do |d|
 			d.image = "redis:4.0-alpine"

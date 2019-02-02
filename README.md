@@ -19,3 +19,6 @@ vagrant up --provision-with setup app
 
 ### Subsequent Runs
 Once you already have everything setup for the app, you can simply run `vagrant up`. If you only need the application, and have your own SQL server, redis, and mailhog (or some combination), you can run `vagrant up [boxes]` and replace `[boxes]` with the boxes to bring online.
+
+### Updating /etc/hosts
+On your first run, and whenever the hostnames change, you'll have to run `vagrant hostmanager app --provider docker` to update your /etc/hosts file.
