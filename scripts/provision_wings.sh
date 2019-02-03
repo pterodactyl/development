@@ -4,9 +4,12 @@ export DEBIAN_FRONTEND=noninteractive
 chown -R vagrant:vagrant /home/vagrant
 
 echo "Install docker, go and some dependencies"
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add - > /dev/null
+add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" > /dev/null
+add-apt-repository -y ppa:longsleep/golang-backports > /dev/null
 apt-get -qq update
 apt-get -qq -o=Dpkg::Use-Pty=0 upgrade
-apt-get -qq -o=Dpkg::Use-Pty=0 install -y golang-go docker.io mercurial tar unzip make gcc g++ python
+apt-get -qq -o=Dpkg::Use-Pty=0 install -y golang-go docker-ce mercurial tar unzip make gcc g++ python
 
 usermod -aG docker vagrant
 
