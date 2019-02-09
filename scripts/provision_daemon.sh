@@ -33,7 +33,7 @@ export GOPATH=/go
 echo 'export PATH=$PATH:$GOPATH/bin' >> /home/vagrant/.profile
 
 echo "Install nodejs dependencies"
-$(cd /srv/daemon && yarn install)
+$(cd /srv/daemon && npm install)
 
 echo "   ------------"
 echo "Provisioning is completed."
