@@ -28,8 +28,12 @@ Vagrant.configure("2") do |config|
 
 		app.vm.provider "docker" do |d|
 			d.image = "quay.io/pterodactyl/vagrant-panel"
-			d.create_args = ["-it", "--add-host=host.pterodactyl.test:172.17.0.1", 
-				"--add-host=daemon.pterodactyl.test:192.168.50.4", "--add-host=wings.pterodactyl.test:192.168.50.3"]
+			d.create_args = [
+			    "-it",
+			    "--add-host=host.pterodactyl.test:172.17.0.1",
+				"--add-host=daemon.pterodactyl.test:192.168.50.4",
+				"--add-host=wings.pterodactyl.test:192.168.50.3",
+			]
 			d.ports = ["80:80", "8080:8080", "8081:8081"]
 
 			if ENV['FILE_SYNC_METHOD'] === 'docker-sync'

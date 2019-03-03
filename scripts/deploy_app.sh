@@ -47,9 +47,10 @@ opcache.enable_cli = 1
 EOF
 
 cat >> /etc/php/7.2/fpm/conf.d/20-xdebug.ini <<EOF
-xdebug.remote_enable=1
-xdebug.profiler_enable=1
-xdebug.remote_host=host.pterodactyl.test
+xdebug.remote_enable = 1
+xdebug.remote_host = host.docker.internal
+xdebug.remote_port = 9000
+xdebug.idekey = PHPSTORM
 EOF
 
 # Install development dependencies
