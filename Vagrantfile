@@ -67,9 +67,14 @@ Vagrant.configure("2") do |config|
 		wings.vm.hostname = "wings.pterodactyl.test"
 		wings.vm.box = "bento/ubuntu-18.04"
 
+        wings.vm.provider "virtualbox" do |v|
+            v.memory = 2048
+            v.cpus = 2
+            v.customize ["modifyvm", :id, "--cpuexecutioncap", "75"]
+        end
+
 		wings.vm.synced_folder ".", "/vagrant", disabled: true
-		wings.vm.synced_folder "#{vagrant_root}/code/wings", "/home/vagrant/go/src/github.com/pterodactyl/wings",
-			owner: "vagrant", group: "vagrant"
+        wings.vm.synced_folder "#{vagrant_root}/code/wings", "/home/vagrant/wings", owner: "vagrant", group: "vagrant"
 
 		wings.vm.network :private_network, ip: "192.168.50.3"
 

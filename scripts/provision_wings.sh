@@ -1,25 +1,23 @@
 #!/bin/bash
 export DEBIAN_FRONTEND=noninteractive
 
-chown -R vagrant:vagrant /home/vagrant
+# Add Docker's GPG key and configure the repository
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
 
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add - > /dev/null
-add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" > /dev/null
-add-apt-repository -y ppa:longsleep/golang-backports > /dev/null
-apt-get -qq update
-apt-get -qq -o=Dpkg::Use-Pty=0 upgrade
-apt-get -qq -o=Dpkg::Use-Pty=0 install -y golang-go docker-ce mercurial tar unzip make gcc g++ python
+# Add support for easily fetching the latest version of Go
+add-apt-repository ppa:longsleep/golang-backports
 
+# Perform the installation of the required software.
+apt -y update
+apt -y --no-install-recommends install tar zip unzip make gcc g++ python docker-ce docker-ce-cli containerd.io golang-go
+
+# Configure the vagrant user to have permission to use Docker.
 usermod -aG docker vagrant
 
-echo "export GOPATH=/home/vagrant/go" >> /home/vagrant/.profile
-export GOPATH=/go
-echo "export PATH=$PATH:$GOPATH/bin" >> /home/vagrant/.profile
+# Ensure docker is started and will continue to start up.
+systemctl enable docker --now
 
-sudo -H -u vagrant bash -c 'go get -u github.com/golang/dep/cmd/dep'
-sudo -H -u vagrant bash -c 'go get -u github.com/derekparker/delve/cmd/dlv'
-
-wget https://github.com/bcicen/ctop/releases/download/v0.7.1/ctop-0.7.1-linux-amd64 -q -O /usr/local/bin/ctop
+# Install ctop for easy container metrics visualization.
+curl -L https://github.com/bcicen/ctop/releases/download/v0.7.1/ctop-0.7.1-linux-amd64 -o /usr/local/bin/ctop
 chmod +x /usr/local/bin/ctop
-
-echo "cd /home/vagrant/wings " >> /home/vagrant/.profile
