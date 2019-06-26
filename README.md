@@ -7,6 +7,7 @@ You'll need the following things installed on your machine.
 * Vagrant
 * VirtualBox
 * Docker
+* mkcert
 
 You'll also need the following Vagrant plugins: `vagrant-hostmanager` and `vagrant-vbguest`
 

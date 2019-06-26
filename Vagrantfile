@@ -19,6 +19,7 @@ Vagrant.configure("2") do |config|
 		app.vm.synced_folder ".", "/vagrant", disabled: true
 
 		app.vm.network "forwarded_port", guest: 80, host: 80
+		app.vm.network "forwarded_port", guest: 443, host: 443
 		app.vm.network "forwarded_port", guest: 8080, host: 8080
 		app.vm.network "forwarded_port", guest: 8081, host: 8081
 
@@ -34,12 +35,18 @@ Vagrant.configure("2") do |config|
 				"--add-host=daemon.pterodactyl.test:192.168.50.4",
 				"--add-host=wings.pterodactyl.test:192.168.50.3",
 			]
-			d.ports = ["80:80", "8080:8080", "8081:8081"]
+			d.ports = ["80:80", "443:443", "8080:8080", "8081:8081"]
 
 			if ENV['FILE_SYNC_METHOD'] === 'docker-sync'
-				d.volumes = ["panel-sync:/srv/www:nocopy"]
+				d.volumes = [
+				    "panel-sync:/srv/www:nocopy",
+				    "#{vagrant_root}/.data/certificates:/etc/ssl/private:ro"
+				]
 			else
-				d.volumes = ["#{vagrant_root}/code/panel:/srv/www:cached"]
+				d.volumes = [
+				    "#{vagrant_root}/code/panel:/srv/www:cached",
+				    "#{vagrant_root}/.data/certificates:/etc/ssl/private:ro"
+				]
 			end
 
 			d.remains_running = true
@@ -75,6 +82,7 @@ Vagrant.configure("2") do |config|
 
 		wings.vm.synced_folder ".", "/vagrant", disabled: true
         wings.vm.synced_folder "#{vagrant_root}/code/wings", "/home/vagrant/wings", owner: "vagrant", group: "vagrant"
+        wings.vm.synced_folder "#{vagrant_root}/.data/certificates", "/etc/ssl/private", owner: "vagrant", group: "vagrant"
 
 		wings.vm.network :private_network, ip: "192.168.50.3"
 
@@ -87,6 +95,7 @@ Vagrant.configure("2") do |config|
 
 		daemon.vm.synced_folder ".", "/vagrant", disabled: true
 		daemon.vm.synced_folder "#{vagrant_root}/code/daemon", "/srv/daemon", owner: "vagrant", group: "vagrant"
+		daemon.vm.synced_folder "#{vagrant_root}/.data/certificates", "/etc/ssl/private", owner: "vagrant", group: "vagrant"
 		daemon.vm.synced_folder "#{vagrant_root}/code/sftp-server", "/home/vagrant/sftp-server", owner: "vagrant", group: "vagrant"
 		daemon.vm.synced_folder ".data/daemon-data", "/srv/daemon-data", create: true
 
