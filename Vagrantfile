@@ -82,6 +82,7 @@ Vagrant.configure("2") do |config|
 
 		wings.vm.synced_folder ".", "/vagrant", disabled: true
         wings.vm.synced_folder "#{vagrant_root}/code/wings", "/home/vagrant/wings", owner: "vagrant", group: "vagrant"
+        wings.vm.synced_folder "#{vagrant_root}/code/sftp-server", "/home/vagrant/sftp-server", owner: "vagrant", group: "vagrant"
         wings.vm.synced_folder "#{vagrant_root}/.data/certificates", "/etc/ssl/private", owner: "vagrant", group: "vagrant"
 
 		wings.vm.network :private_network, ip: "192.168.50.3"
@@ -97,7 +98,6 @@ Vagrant.configure("2") do |config|
 		daemon.vm.synced_folder "#{vagrant_root}/code/daemon", "/srv/daemon", owner: "vagrant", group: "vagrant"
 		daemon.vm.synced_folder "#{vagrant_root}/.data/certificates", "/etc/ssl/private", owner: "vagrant", group: "vagrant"
 		daemon.vm.synced_folder "#{vagrant_root}/code/sftp-server", "/home/vagrant/sftp-server", owner: "vagrant", group: "vagrant"
-		daemon.vm.synced_folder ".data/daemon-data", "/srv/daemon-data", create: true
 
 		daemon.vm.network :private_network, ip: "192.168.50.4"
 

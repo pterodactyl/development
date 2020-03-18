@@ -36,7 +36,7 @@ rm -f /root/app
 ln -s /srv/www /root/app
 
 # Configure OPCache
-cat >> /etc/php/7.2/cli/conf.d/10-opcache.ini <<EOF
+cat >> /etc/php/7.4/cli/conf.d/10-opcache.ini <<EOF
 opcache.revalidate_freq = 0
 opcache.max_accelerated_files = 11003
 opcache.memory_consumption = 192
@@ -46,7 +46,7 @@ opcache.enable = 1
 opcache.enable_cli = 1
 EOF
 
-cat >> /etc/php/7.2/fpm/conf.d/20-xdebug.ini <<EOF
+cat >> /etc/php/7.4/fpm/conf.d/20-xdebug.ini <<EOF
 xdebug.remote_enable = 1
 xdebug.remote_host = host.docker.internal
 xdebug.remote_port = 9000
