@@ -54,7 +54,8 @@ Vagrant.configure("2") do |config|
 		end
 
 		app.vm.provision :hostmanager
-		app.vm.provision "deploy_files", type: "file", source: "#{vagrant_root}/build/configs", destination: "/tmp/.deploy"
+		app.vm.provision "deploy_nginx_config", type: "file", source: "#{vagrant_root}/build/configs/nginx/pterodactyl.test.conf", destination: "/tmp/.deploy/nginx/pterodactyl.test.conf"
+		app.vm.provision "deploy_supervisor_config", type: "file", source: "#{vagrant_root}/build/configs/supervisor/pterodactyl.conf", destination: "/tmp/.deploy/supervisor/pterodactyl.conf"
 		app.vm.provision "configure_application", type: "shell", path: "#{vagrant_root}/scripts/deploy_app.sh"
 		app.vm.provision "setup", type: "shell", run: "never", inline: <<-SHELL
 			cd /srv/www
