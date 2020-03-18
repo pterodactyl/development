@@ -31,7 +31,7 @@ RUN curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash - \
 		cron \
 		nodejs \
 		yarn \
-		nano
+		nano \
 	&& curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
 	&& rm -rf /var/lib/apt/lists/*
 
