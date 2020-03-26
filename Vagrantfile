@@ -135,21 +135,20 @@ Vagrant.configure("2") do |config|
 	config.vm.define "mysql" do |mysql|
 		mysql.vm.hostname = "mysql.pterodactyl.test"
 		mysql.vm.synced_folder ".", "/vagrant", disabled: true
-		mysql.vm.synced_folder ".data/mysql", "/var/lib/mysql", create: true
 
-		mysql.vm.network "forwarded_port", guest: 3306, host: 3306
+		mysql.vm.network "forwarded_port", guest: 3306, host: 33060
 
 		mysql.vm.provider "docker" do |d|
-			d.image = "mysql:5.7"
-			d.ports = ["3306:3306"]
+			d.image = "mysql:8"
+			d.ports = ["33060:3306"]
 			d.cmd = [
 				"--sql_mode=no_engine_substitution",
 				"--innodb_buffer_pool_size=1G",
 				"--innodb_log_file_size=256M",
 				"--innodb_flush_log_at_trx_commit=0",
-				"--innodb_flush_method=O_DIRECT",
-				"--query_cache_type=1"
+				"--lower_case_table_names=1"
 			]
+			d.volumes = ["#{vagrant_root}/.data/mysql:/var/lib/mysql:cached"]
 			d.env = {
 				"MYSQL_ROOT_PASSWORD": "root",
 				"MYSQL_DATABASE": "panel",
@@ -199,7 +198,7 @@ Vagrant.configure("2") do |config|
 		redis.vm.network "forwarded_port", guest: 6379, host: 6379
 
 		redis.vm.provider "docker" do |d|
-			d.image = "redis:4.0-alpine"
+			d.image = "redis:5-alpine"
 			d.ports = ["6379:6379"]
 			d.remains_running = true
 		end
