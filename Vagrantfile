@@ -15,7 +15,7 @@ Vagrant.configure("2") do |config|
 
 	config.vm.define "app", primary: true do |app|
 		app.vm.hostname = "pterodactyl.test"
-
+		app.vm.box = "bento/ubuntu-18.04"
 		app.vm.synced_folder ".", "/vagrant", disabled: true
 
 		app.vm.network "forwarded_port", guest: 80, host: 80
