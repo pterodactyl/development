@@ -64,7 +64,7 @@ Vagrant.configure("2") do |config|
 			php artisan key:generate --force --no-interaction
 
 			php artisan p:environment:setup --new-salt --author="you@example.com" --url="http://pterodactyl.test" --timezone="America/Los_Angeles" --cache=redis --session=redis --queue=redis --redis-host="host.pterodactyl.test" --no-interaction
-			php artisan p:environment:database --host="host.pterodactyl.test" --database=panel --username=pterodactyl --password=pterodactyl --no-interaction
+			php artisan p:environment:database --host="host.pterodactyl.test" --database=panel --username=pterodactyl --password=pterodactyl --port=33060 --no-interaction
 			php artisan p:environment:mail --driver=smtp --email="outgoing@example.com" --from="Pterodactyl Panel" --host="host.pterodactyl.test" --port=1025 --no-interaction
 
 			php artisan migrate --seed
