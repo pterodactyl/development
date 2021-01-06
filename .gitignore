@@ -3,3 +3,6 @@
 .data/**
 .docker-sync/**
 .idea
+
+# intended for per-machine config
+vagrant.config.yml

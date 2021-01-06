@@ -1,3 +1,6 @@
+require 'yaml'
+require 'pathname'
+
 ["vagrant-vbguest", "vagrant-hostmanager"].each do |plugin|
     unless Vagrant.has_plugin?(plugin)
       raise plugin + " plugin is not installed. Hint: vagrant plugin install " + plugin
@@ -5,6 +8,11 @@
 end
 
 vagrant_root = File.dirname(__FILE__)
+
+$configMap = FileTest.exist?("#{vagrant_root}/vagrant.config.yml") ? YAML.load_file("#{vagrant_root}/vagrant.config.yml") : {}
+def config(key, def_val)
+  return $configMap.dig(*key.split(".")) || def_val
+end
 
 Vagrant.configure("2") do |config|
 	config.hostmanager.enabled = false
@@ -76,8 +84,8 @@ Vagrant.configure("2") do |config|
 		wings.vm.box = "bento/ubuntu-18.04"
 
         wings.vm.provider "virtualbox" do |v|
-            v.memory = 2048
-            v.cpus = 2
+            v.memory = config("wings.memory", 2048)
+            v.cpus = config("wings.cpus", 2)
             v.customize ["modifyvm", :id, "--cpuexecutioncap", "75"]
         end
 
