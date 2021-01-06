@@ -21,3 +21,6 @@ systemctl enable docker --now
 # Install ctop for easy container metrics visualization.
 curl -L https://github.com/bcicen/ctop/releases/download/v0.7.1/ctop-0.7.1-linux-amd64 -o /usr/local/bin/ctop
 chmod +x /usr/local/bin/ctop
+
+# Add hosts entry for pterodactyl.test so Wings can reach the panel
+echo 192.168.50.1 pterodactyl.test >> /etc/hosts
