@@ -47,12 +47,12 @@ Vagrant.configure("2") do |config|
 
 			if ENV['FILE_SYNC_METHOD'] === 'docker-sync'
 				d.volumes = [
-				    "panel-sync:/srv/www:nocopy",
+				    "panel-sync:/root/app:nocopy",
 				    "#{vagrant_root}/.data/certificates:/etc/ssl/private:ro"
 				]
 			else
 				d.volumes = [
-				    "#{vagrant_root}/code/panel:/srv/www:cached",
+				    "#{vagrant_root}/code/panel:/root/app:cached",
 				    "#{vagrant_root}/.data/certificates:/etc/ssl/private:ro"
 				]
 			end
@@ -66,7 +66,7 @@ Vagrant.configure("2") do |config|
 		app.vm.provision "deploy_supervisor_config", type: "file", source: "#{vagrant_root}/build/configs/supervisor/pterodactyl.conf", destination: "/tmp/.deploy/supervisor/pterodactyl.conf"
 		app.vm.provision "configure_application", type: "shell", path: "#{vagrant_root}/scripts/deploy_app.sh"
 		app.vm.provision "setup", type: "shell", run: "never", inline: <<-SHELL
-			cd /srv/www
+			cd /root/app
 
 			cp .env .env.bkup
 			php artisan key:generate --force --no-interaction

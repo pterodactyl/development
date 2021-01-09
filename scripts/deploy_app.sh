@@ -10,7 +10,7 @@ mkdir -p /run/php
 # Disable xdebug on the CLI for _MASSIVE_ performance improvement
 phpdismod -s cli xdebug
 
-cd /srv/www
+cd /root/app
 chmod -R 755 storage/* bootstrap/cache
 chown -R www-data:www-data storage
 
@@ -29,11 +29,11 @@ composer install --no-interaction --prefer-dist --no-suggest --no-scripts --no-p
 php artisan config:clear
 
 # Configure the cronjob
-(crontab -l 2>/dev/null; echo "* * * * * php /srv/www/artisan schedule:run >> /dev/null 2>&1") | crontab -
+(crontab -l 2>/dev/null; echo "* * * * * php /root/app/artisan schedule:run >> /dev/null 2>&1") | crontab -
 
 # Create symlink
 rm -f /root/app
-ln -s /srv/www /root/app
+ln -s /root/app /srv/www
 
 # Configure OPCache
 cat >> /etc/php/7.4/cli/conf.d/10-opcache.ini <<EOF
@@ -66,3 +66,5 @@ supervisorctl reread
 supervisorctl update
 supervisorctl start pteroq:*
 supervisorctl restart nginx
+
+echo "done."
