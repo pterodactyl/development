@@ -27,7 +27,7 @@ There are VMs for both, the old and the new, daemons configured. They do not sta
 #### Wings
 Example Wings startup:
 ```
-sudo /path/to/wings --debug --ignore-certificate-errors --config=/path/to/config.yml
+sudo /path/to/wings --debug --config=/path/to/config.yml
 ```
 
 ### Updating /etc/hosts
