@@ -32,11 +32,12 @@ Vagrant.configure("2") do |config|
 		app.vm.network "forwarded_port", guest: 8081, host: 8081
 
 		app.ssh.insert_key = true
-		app.ssh.username = "root"
+		app.ssh.username = "vagrant"
 		app.ssh.password = "vagrant"
 
 		app.vm.provider "docker" do |d|
-			d.image = "quay.io/pterodactyl/vagrant-panel"
+			d.build_dir = "./build" 
+			d.build_args = "-f=build/Dockerfile-panel"
 			d.create_args = [
 			    "-it",
 			    "--add-host=host.pterodactyl.test:172.17.0.1",
@@ -47,12 +48,12 @@ Vagrant.configure("2") do |config|
 
 			if ENV['FILE_SYNC_METHOD'] === 'docker-sync'
 				d.volumes = [
-				    "panel-sync:/srv/www:nocopy",
+				    "panel-sync:/home/vagrant/app:nocopy",
 				    "#{vagrant_root}/.data/certificates:/etc/ssl/private:ro"
 				]
 			else
 				d.volumes = [
-				    "#{vagrant_root}/code/panel:/srv/www:cached",
+				    "#{vagrant_root}/code/panel:/home/vagrant/app:cached",
 				    "#{vagrant_root}/.data/certificates:/etc/ssl/private:ro"
 				]
 			end
@@ -64,9 +65,9 @@ Vagrant.configure("2") do |config|
 		app.vm.provision :hostmanager
 		app.vm.provision "deploy_nginx_config", type: "file", source: "#{vagrant_root}/build/configs/nginx/pterodactyl.test.conf", destination: "/tmp/.deploy/nginx/pterodactyl.test.conf"
 		app.vm.provision "deploy_supervisor_config", type: "file", source: "#{vagrant_root}/build/configs/supervisor/pterodactyl.conf", destination: "/tmp/.deploy/supervisor/pterodactyl.conf"
-		app.vm.provision "configure_application", type: "shell", path: "#{vagrant_root}/scripts/deploy_app.sh"
+		app.vm.provision "configure_application", type: "shell", privileged: false, path: "#{vagrant_root}/scripts/deploy_app.sh"
 		app.vm.provision "setup", type: "shell", run: "never", inline: <<-SHELL
-			cd /srv/www
+			cd /home/vagrant/app
 
 			cp .env .env.bkup
 			php artisan key:generate --force --no-interaction
@@ -92,11 +93,12 @@ Vagrant.configure("2") do |config|
 		wings.vm.synced_folder ".", "/vagrant", disabled: true
         wings.vm.synced_folder "#{vagrant_root}/code/wings", "/home/vagrant/wings", owner: "vagrant", group: "vagrant"
         wings.vm.synced_folder "#{vagrant_root}/code/sftp-server", "/home/vagrant/sftp-server", owner: "vagrant", group: "vagrant"
-        wings.vm.synced_folder "#{vagrant_root}/.data/certificates", "/etc/ssl/private", owner: "vagrant", group: "vagrant"
+        wings.vm.synced_folder "#{vagrant_root}/.data/certificates", "/etc/ssl/pterodactyl", owner: "vagrant", group: "vagrant"
 
 		wings.vm.network :private_network, ip: "192.168.50.3"
 
 		wings.vm.provision "provision", type: "shell", path: "#{vagrant_root}/scripts/provision_wings.sh"
+		config.vm.provision "file", source: "~/.gitconfig", destination: ".gitconfig"
 	end
 
 	config.vm.define "daemon", autostart: false do |daemon|

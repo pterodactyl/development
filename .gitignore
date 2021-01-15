@@ -1,6 +1,6 @@
-.vagrant/**
+.vagrant/
 **/.DS_Store
-.data/**
+.data/
 .docker-sync/**
 .idea
 

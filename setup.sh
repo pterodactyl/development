@@ -17,10 +17,11 @@ git clone https://github.com/pterodactyl/sftp-server.git code/sftp-server
 mkdir -p .data/certificates
 
 mkcert -install
-mkcert pterodactyl.test *.pterodactyl.test
+mkcert pterodactyl.test '*.pterodactyl.test'
 
 mv *pterodactyl.test*-key.pem .data/certificates/pterodactyl.test-key.pem
 mv *pterodactyl.test*.pem .data/certificates/pterodactyl.test.pem
+cp $(mkcert -CAROOT)/rootCA.pem .data/certificates/
 
 # sudo gem install docker-sync
 # docker-sync start

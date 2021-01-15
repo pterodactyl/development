@@ -35,6 +35,10 @@ RUN curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash - \
 	&& curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
 	&& rm -rf /var/lib/apt/lists/*
 
-EXPOSE 80
+RUN useradd -m -s /bin/bash -p $(echo "vagrant" | openssl passwd -1 -stdin) vagrant \
+	&& echo 'ALL            ALL = (ALL) NOPASSWD: ALL' > /etc/sudoers
 
-ENTRYPOINT /usr/bin/supervisord && service ssh start && service cron start && /bin/bash
+EXPOSE 80
+USER vagrant
+
+ENTRYPOINT sudo su -c "/usr/bin/supervisord && service ssh start && service cron start && /bin/bash"

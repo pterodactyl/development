@@ -1,8 +1,8 @@
 #!/bin/bash
 export DEBIAN_FRONTEND=noninteractive
 
-cp /tmp/.deploy/supervisor/pterodactyl.conf /etc/supervisor/conf.d/pterodactyl.conf
-cp /tmp/.deploy/nginx/pterodactyl.test.conf /etc/nginx/sites-available/pterodactyl.test.conf
+sudo cp /tmp/.deploy/supervisor/pterodactyl.conf /etc/supervisor/conf.d/pterodactyl.conf
+sudo cp /tmp/.deploy/nginx/pterodactyl.test.conf /etc/nginx/sites-available/pterodactyl.test.conf
 
 # Needed for FPM to start correctly.
 mkdir -p /run/php
@@ -10,9 +10,10 @@ mkdir -p /run/php
 # Disable xdebug on the CLI for _MASSIVE_ performance improvement
 phpdismod -s cli xdebug
 
-cd /srv/www
+cd /home/vagrant/app
+sudo chown -R vagrant:vagrant *
+sudo chown -R www-data:www-data storage
 chmod -R 755 storage/* bootstrap/cache
-chown -R www-data:www-data storage
 
 # Start out in a "this isn't a new install" mode
 freshInstall=false
@@ -29,14 +30,14 @@ composer install --no-interaction --prefer-dist --no-suggest --no-scripts --no-p
 php artisan config:clear
 
 # Configure the cronjob
-(crontab -l 2>/dev/null; echo "* * * * * php /srv/www/artisan schedule:run >> /dev/null 2>&1") | crontab -
+(crontab -l 2>/dev/null; echo "* * * * * php /home/vagrant/app/artisan schedule:run >> /dev/null 2>&1") | crontab -
 
 # Create symlink
-rm -f /root/app
-ln -s /srv/www /root/app
+sudo rm -f /srv/www
+sudo ln -s /home/vagrant/app /srv/www
 
 # Configure OPCache
-cat >> /etc/php/7.4/cli/conf.d/10-opcache.ini <<EOF
+sudo cat | sudo tee -a /etc/php/7.4/cli/conf.d/10-opcache.ini > /dev/null <<EOF
 opcache.revalidate_freq = 0
 opcache.max_accelerated_files = 11003
 opcache.memory_consumption = 192
@@ -46,7 +47,7 @@ opcache.enable = 1
 opcache.enable_cli = 1
 EOF
 
-cat >> /etc/php/7.4/fpm/conf.d/20-xdebug.ini <<EOF
+sudo cat | sudo tee -a /etc/php/7.4/fpm/conf.d/20-xdebug.ini > /dev/null <<EOF
 xdebug.remote_enable = 1
 xdebug.remote_host = host.docker.internal
 xdebug.remote_port = 9000
@@ -57,12 +58,14 @@ EOF
 yarn install --no-progress
 
 # Cleanup
-rm -rfv /var/www
-rm -rv /etc/nginx/sites-enabled/*
-ln -s /etc/nginx/sites-available/pterodactyl.test.conf /etc/nginx/sites-enabled/pterodactyl.test.conf
+sudo rm -rfv /var/www
+sudo rm -rv /etc/nginx/sites-enabled/*
+sudo ln -s /etc/nginx/sites-available/pterodactyl.test.conf /etc/nginx/sites-enabled/pterodactyl.test.conf
 
 # Start processes
-supervisorctl reread
-supervisorctl update
-supervisorctl start pteroq:*
-supervisorctl restart nginx
+sudo supervisorctl reread
+sudo supervisorctl update
+sudo supervisorctl start pteroq:*
+sudo supervisorctl restart nginx
+
+echo "done."

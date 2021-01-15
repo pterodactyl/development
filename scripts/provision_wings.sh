@@ -19,8 +19,22 @@ usermod -aG docker vagrant
 systemctl enable docker --now
 
 # Install ctop for easy container metrics visualization.
-curl -L https://github.com/bcicen/ctop/releases/download/v0.7.1/ctop-0.7.1-linux-amd64 -o /usr/local/bin/ctop
+curl -fsSL https://github.com/bcicen/ctop/releases/download/v0.7.1/ctop-0.7.1-linux-amd64 -o /usr/local/bin/ctop
 chmod +x /usr/local/bin/ctop
 
-# Add hosts entry for pterodactyl.test so Wings can reach the panel
-echo 192.168.50.1 pterodactyl.test >> /etc/hosts
+# Move certificates to sensible default locations
+cp /etc/ssl/pterodactyl/rootCA.pem /etc/ssl/certs/mkcert.pem
+mkdir -p /etc/letsencrypt/live/wings.pterodactyl.test/
+cp /etc/ssl/pterodactyl/pterodactyl.test.pem /etc/letsencrypt/live/wings.pterodactyl.test/fullchain.pem
+cp /etc/ssl/pterodactyl/pterodactyl.test-key.pem /etc/letsencrypt/live/wings.pterodactyl.test/privkey.pem
+
+# create config directory
+mkdir /etc/pterodactyl /var/log/pterodactyl
+
+# ensure permissions are set correctly
+chown -R vagrant:vagrant /home/vagrant /etc/pterodactyl /var/log/pterodactyl
+
+# map pterodactyl.test to the host system
+echo "$(ip route | grep default | cut -d' ' -f3,3) pterodactyl.test" >> /etc/hosts
+
+echo "done."

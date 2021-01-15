@@ -32,3 +32,12 @@ sudo /path/to/wings --debug --ignore-certificate-errors --config=/path/to/config
 
 ### Updating /etc/hosts
 On your first run, and whenever the hostnames change, you'll have to run `vagrant hostmanager app --provider docker` to update your /etc/hosts file.
+
+### Configuring the Environment
+A `vagrant.config.yml` can be used to configure the following properties of the environment. All values are optional.
+
+```yml
+wings: # the VM used for wings
+  cpus: 2
+  memory: 2048
+```
