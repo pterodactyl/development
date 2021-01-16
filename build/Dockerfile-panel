@@ -1,15 +1,16 @@
-FROM quay.io/pterodactyl/vagrant-core
+FROM ghcr.io/pterodactyl/development/base
 
 LABEL maintainer="dane@daneeveritt.com" \
-	  description="Docker image allowing Pterodactyl Panel to run using Vagrant."
+	  description="Docker image allowing Pterodactyl Panel to run using Vagrant." \
+	  org.opencontainers.image.source=https://github.com/pterodactyl/development
 
 RUN curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash - \
 	&& curl -sL https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add - \
 	&& echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list \
-	&& add-apt-repository -y ppa:ondrej/php \
-	&& apt -y update \
-	&& apt -y upgrade \
-	&& apt -y --no-install-recommends install software-properties-common \
+	&& sudo add-apt-repository -y ppa:ondrej/php \
+	&& sudo apt -y update \
+	&& sudo apt -y upgrade \
+	&& sudo apt -y --no-install-recommends install software-properties-common \
 		php7.4 \
 		php7.4-cli \
 		php7.4-gd \
@@ -32,11 +33,8 @@ RUN curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash - \
 		nodejs \
 		yarn \
 		nano \
-	&& curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
-	&& rm -rf /var/lib/apt/lists/*
-
-RUN useradd -m -s /bin/bash -p $(echo "vagrant" | openssl passwd -1 -stdin) vagrant \
-	&& echo 'ALL            ALL = (ALL) NOPASSWD: ALL' > /etc/sudoers
+	&& curl -sS https://getcomposer.org/installer | sudo php -- --install-dir=/usr/local/bin --filename=composer \
+	&& sudo rm -rf /var/lib/apt/lists/*
 
 EXPOSE 80
 USER vagrant

@@ -5,15 +5,15 @@ sudo cp /tmp/.deploy/supervisor/pterodactyl.conf /etc/supervisor/conf.d/pterodac
 sudo cp /tmp/.deploy/nginx/pterodactyl.test.conf /etc/nginx/sites-available/pterodactyl.test.conf
 
 # Needed for FPM to start correctly.
-mkdir -p /run/php
+sudo mkdir -p /run/php
 
 # Disable xdebug on the CLI for _MASSIVE_ performance improvement
-phpdismod -s cli xdebug
+sudo phpdismod -s cli xdebug
 
 cd /home/vagrant/app
 sudo chown -R vagrant:vagrant *
-sudo chown -R www-data:www-data storage
-chmod -R 755 storage/* bootstrap/cache
+sudo chown -R www-data:vagrant storage
+sudo chmod -R 775 storage/* bootstrap/cache
 
 # Start out in a "this isn't a new install" mode
 freshInstall=false
@@ -26,7 +26,7 @@ fi
 sed -i "s/APP_ENV=.*/APP_ENV=local/" .env
 sed -i "s/APP_DEBUG=.*/APP_DEBUG=true/" .env
 
-composer install --no-interaction --prefer-dist --no-suggest --no-scripts --no-progress
+composer install --no-interaction --prefer-dist --no-scripts --no-progress
 php artisan config:clear
 
 # Configure the cronjob

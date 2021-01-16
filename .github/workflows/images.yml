@@ -1,0 +1,33 @@
+name: Build and publish docker images
+on:
+  push:
+    branches:
+      - 'master'
+
+jobs:
+  images:
+    name: Build and push base image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: docker/setup-qemu-action@v1
+      - uses: docker/setup-buildx-action@v1
+      - uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.REGISTRY_TOKEN }}
+
+      - name: Base image
+        uses: docker/build-push-action@v2
+        with:
+          file: build/Dockerfile-base
+          push: true
+          tags: ghcr.io/pterodactyl/development/base:latest
+
+      - name: Panel image
+        uses: docker/build-push-action@v2
+        with:
+          file: build/Dockerfile-panel
+          push: true
+          tags: ghcr.io/pterodactyl/development/panel:latest

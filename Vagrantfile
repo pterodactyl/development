@@ -123,21 +123,21 @@ Vagrant.configure("2") do |config|
 		docs.vm.network "forwarded_port", guest: 9091, host: 9091
 
 		docs.ssh.insert_key = true
-		docs.ssh.username = "root"
+		docs.ssh.username = "vagrant"
 		docs.ssh.password = "vagrant"
 
 		docs.vm.provider "docker" do |d|
-			d.image = "quay.io/pterodactyl/vagrant-core"
+			d.image = "ghcr.io/pterodactyl/development/base"
 			d.create_args = ["-it", "--add-host=host.pterodactyl.test:172.17.0.1"]
 			d.ports = ["9090:80", "9091:9091"]
-			d.volumes = ["#{vagrant_root}/code/documentation:/srv/documentation:cached"]
+			d.volumes = ["#{vagrant_root}/code/documentation:/home/vagrant/docs:cached"]
 			d.remains_running = true
 			d.has_ssh = true
 			d.privileged = true
 		end
 
 		docs.vm.provision "deploy_files", type: "file", source: "#{vagrant_root}/build/configs", destination: "/tmp/.deploy"
-		docs.vm.provision "setup_documentation", type: "shell", path: "#{vagrant_root}/scripts/deploy_docs.sh"
+		docs.vm.provision "setup_documentation", type: "shell", privileged: false, path: "#{vagrant_root}/scripts/deploy_docs.sh"
 	end
 
 
