@@ -23,5 +23,7 @@ mv *pterodactyl.test*-key.pem .data/certificates/pterodactyl.test-key.pem
 mv *pterodactyl.test*.pem .data/certificates/pterodactyl.test.pem
 cp $(mkcert -CAROOT)/rootCA.pem .data/certificates/
 
+mkdir -p .data/wings/{etc,tmp,lib}
+
 # sudo gem install docker-sync
 # docker-sync start

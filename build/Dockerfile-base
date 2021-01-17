@@ -12,7 +12,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
 
 RUN apt -y update \
 	&& apt -y upgrade \
-	&& apt -y --no-install-recommends install software-properties-common gpg-agent sudo openssh-server locales curl iproute2 lsb-release git \
+	&& apt -y --no-install-recommends install software-properties-common gpg-agent sudo openssh-server locales curl iproute2 lsb-release git nano \
 	&& sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen \
 	&& locale-gen \
 	&& useradd -m -s /bin/bash -p $(echo "vagrant" | openssl passwd -1 -stdin) vagrant \

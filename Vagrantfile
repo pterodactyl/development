@@ -1,5 +1,6 @@
 require 'yaml'
 require 'pathname'
+require 'pp'
 
 ["vagrant-vbguest", "vagrant-hostmanager"].each do |plugin|
     unless Vagrant.has_plugin?(plugin)
@@ -20,6 +21,15 @@ Vagrant.configure("2") do |config|
 	config.hostmanager.manage_guest = false
 	config.hostmanager.ignore_private_ip = false
 	config.hostmanager.include_offline = true
+	config.hostmanager.ip_resolver = proc do |vm, resolving_vm|
+			if vm.provider_name == :docker
+				id = vm.provider.to_s.split[1][1..-2]
+				if id != "ne" # aka. we have a valid id
+					nwInfo = vm.provider.driver.inspect_container(id)["NetworkSettings"]
+					return nwInfo["IPAddress"]
+				end
+			end
+		end
 
 	config.vm.define "app", primary: true do |app|
 		app.vm.hostname = "pterodactyl.test"
@@ -30,6 +40,7 @@ Vagrant.configure("2") do |config|
 		app.vm.network "forwarded_port", guest: 443, host: 443
 		app.vm.network "forwarded_port", guest: 8080, host: 8080
 		app.vm.network "forwarded_port", guest: 8081, host: 8081
+		app.vm.network :private_network, type: "dhcp"
 
 		app.ssh.insert_key = true
 		app.ssh.username = "vagrant"
@@ -39,9 +50,7 @@ Vagrant.configure("2") do |config|
 			d.image = "ghcr.io/pterodactyl/development/panel"
 			d.create_args = [
 			    "-it",
-			    "--add-host=host.pterodactyl.test:172.17.0.1",
-				"--add-host=daemon.pterodactyl.test:192.168.50.4",
-				"--add-host=wings.pterodactyl.test:192.168.50.3",
+			    "--add-host=host.pterodactyl.test:172.18.0.1",
 			]
 			d.ports = ["80:80", "443:443", "8080:8080", "8081:8081"]
 			d.name = "pterodev_app"
@@ -82,23 +91,69 @@ Vagrant.configure("2") do |config|
 
 	config.vm.define "wings", autostart: false do |wings|
 		wings.vm.hostname = "wings.pterodactyl.test"
-		wings.vm.box = "bento/ubuntu-18.04"
+		wings.vm.network :private_network, type: "dhcp"
 
-        wings.vm.provider "virtualbox" do |v|
-            v.memory = config("wings.memory", 2048)
-            v.cpus = config("wings.cpus", 2)
-            v.customize ["modifyvm", :id, "--cpuexecutioncap", "75"]
-        end
+		wings.ssh.insert_key = true
+		wings.ssh.username = "vagrant"
+		wings.ssh.password = "vagrant"
+		
+		wings.vm.provider "docker" do |d|
+			d.build_dir = "#{vagrant_root}/build"
+			d.build_args = "-f=build/Dockerfile-wings"
+			d.create_args = [
+			    "-it",
+				"--add-host=host.pterodactyl.test:172.18.0.1",
+				"-e", "DOCKER_CERT_PATH=/certs/client",
+				"-e", "DOCKER_TLS_VERIFY=true",
+				"-e", "DOCKER_HOST=wings-docker.pterodactyl.test:2376"
+			]
 
-		wings.vm.synced_folder ".", "/vagrant", disabled: true
-        wings.vm.synced_folder "#{vagrant_root}/code/wings", "/home/vagrant/wings", owner: "vagrant", group: "vagrant"
-        wings.vm.synced_folder "#{vagrant_root}/code/sftp-server", "/home/vagrant/sftp-server", owner: "vagrant", group: "vagrant"
-        wings.vm.synced_folder "#{vagrant_root}/.data/certificates", "/etc/ssl/pterodactyl", owner: "vagrant", group: "vagrant"
+			d.name = "pterodev_wings"
 
-		wings.vm.network :private_network, ip: "192.168.50.3"
+			d.volumes = [
+				"#{vagrant_root}/code/wings:/home/vagrant/wings",
+				"#{vagrant_root}/.data/certificates:/etc/ssl/pterodactyl",
+				"#{vagrant_root}/.data/wings/etc:/etc/pterodactyl",
+				"#{vagrant_root}/.data/wings/lib:/var/lib/pterodactyl",
+				"#{vagrant_root}/.data/wings/tmp:/tmp",
+				"#{vagrant_root}/.data/wings/docker:/var/lib/docker",
+				"#{vagrant_root}/.data/wings/docker_certs:/certs"
+			]
+
+			d.remains_running = true
+			d.has_ssh = true
+		end
 
 		wings.vm.provision "provision", type: "shell", path: "#{vagrant_root}/scripts/provision_wings.sh"
-		config.vm.provision "file", source: "~/.gitconfig", destination: ".gitconfig"
+		wings.vm.provision "file", source: "~/.gitconfig", destination: ".gitconfig"
+	end
+
+	config.vm.define "wings-docker", autostart: false do |wings_docker|
+		wings_docker.vm.hostname = "wings-docker.pterodactyl.test"
+		wings_docker.vm.network :private_network, type: "dhcp"
+		
+		wings_docker.vm.provider "docker" do |d|
+			d.image = "docker:dind"
+			d.create_args = [
+				"-it",
+				"--privileged",
+				"-e", "DOCKER_TLS_CERTDIR=/certs"
+			]
+
+			d.name = "pterodev_wings_docker"
+
+			d.volumes = [
+				"#{vagrant_root}/.data/wings/lib:/var/lib/pterodactyl",
+				"#{vagrant_root}/.data/wings/tmp:/tmp",
+				"#{vagrant_root}/.data/wings/docker:/var/lib/docker",
+				"#{vagrant_root}/.data/wings/docker_certs:/certs"
+			]
+
+			d.remains_running = true
+		end
+
+		# wings.vm.provision "provision", type: "shell", path: "#{vagrant_root}/scripts/provision_wings.sh"
+		# config.vm.provision "file", source: "~/.gitconfig", destination: ".gitconfig"
 	end
 
 	config.vm.define "daemon", autostart: false do |daemon|
@@ -121,6 +176,7 @@ Vagrant.configure("2") do |config|
 
 		docs.vm.network "forwarded_port", guest: 80, host: 9090
 		docs.vm.network "forwarded_port", guest: 9091, host: 9091
+		docs.vm.network :private_network, type: "dhcp"
 
 		docs.ssh.insert_key = true
 		docs.ssh.username = "vagrant"
@@ -150,6 +206,7 @@ Vagrant.configure("2") do |config|
 		mysql.vm.synced_folder ".", "/vagrant", disabled: true
 
 		mysql.vm.network "forwarded_port", guest: 3306, host: 33060
+		mysql.vm.network :private_network, type: "dhcp"
 
 		mysql.vm.provider "docker" do |d|
 			d.image = "mysql:8"
@@ -178,6 +235,7 @@ Vagrant.configure("2") do |config|
 
 		chrome.vm.network "forwarded_port", guest: 4444, host: 4444
 		chrome.vm.network "forwarded_port", guest: 5900, host: 5900
+		chrome.vm.network :private_network, type: "dhcp"
 
 		chrome.vm.provider "docker" do |d|
 			d.image = "selenium/standalone-chrome-debug:3.12.0-boron"
@@ -195,6 +253,7 @@ Vagrant.configure("2") do |config|
 
 		mh.vm.network "forwarded_port", guest: 1025, host: 1025
 		mh.vm.network "forwarded_port", guest: 8025, host: 8025
+		mh.vm.network :private_network, type: "dhcp"
 
 		mh.vm.provider "docker" do |d|
 			d.image = "mailhog/mailhog"
@@ -209,6 +268,7 @@ Vagrant.configure("2") do |config|
 		redis.vm.synced_folder ".", "/vagrant", disabled: true
 
 		redis.vm.network "forwarded_port", guest: 6379, host: 6379
+		redis.vm.network :private_network, type: "dhcp"
 
 		redis.vm.provider "docker" do |d|
 			d.image = "redis:5-alpine"

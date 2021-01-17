@@ -9,8 +9,7 @@ RUN curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash - \
 	&& echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list \
 	&& sudo add-apt-repository -y ppa:ondrej/php \
 	&& sudo apt -y update \
-	&& sudo apt -y upgrade \
-	&& sudo apt -y --no-install-recommends install software-properties-common \
+	&& sudo apt -y --no-install-recommends install \
 		php7.4 \
 		php7.4-cli \
 		php7.4-gd \
@@ -27,7 +26,6 @@ RUN curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash - \
 		nginx \
 		tar \
 		unzip \
-		git \
 		supervisor \
 		cron \
 		nodejs \
