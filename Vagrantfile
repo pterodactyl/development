@@ -36,8 +36,7 @@ Vagrant.configure("2") do |config|
 		app.ssh.password = "vagrant"
 
 		app.vm.provider "docker" do |d|
-			d.build_dir = "./build" 
-			d.build_args = "-f=build/Dockerfile-panel"
+			d.image = "ghcr.io/pterodactyl/development/panel"
 			d.create_args = [
 			    "-it",
 			    "--add-host=host.pterodactyl.test:172.17.0.1",
@@ -45,6 +44,7 @@ Vagrant.configure("2") do |config|
 				"--add-host=wings.pterodactyl.test:192.168.50.3",
 			]
 			d.ports = ["80:80", "443:443", "8080:8080", "8081:8081"]
+			d.name = "pterodev_app"
 
 			if ENV['FILE_SYNC_METHOD'] === 'docker-sync'
 				d.volumes = [
@@ -130,7 +130,10 @@ Vagrant.configure("2") do |config|
 			d.image = "ghcr.io/pterodactyl/development/base"
 			d.create_args = ["-it", "--add-host=host.pterodactyl.test:172.17.0.1"]
 			d.ports = ["9090:80", "9091:9091"]
+			d.name = "pterodev_docs"
+
 			d.volumes = ["#{vagrant_root}/code/documentation:/home/vagrant/docs:cached"]
+			
 			d.remains_running = true
 			d.has_ssh = true
 			d.privileged = true
