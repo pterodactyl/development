@@ -40,7 +40,6 @@ Vagrant.configure("2") do |config|
 			d.create_args = [
 			    "-it",
 			    "--add-host=host.pterodactyl.test:172.17.0.1",
-				"--add-host=daemon.pterodactyl.test:192.168.50.4",
 				"--add-host=wings.pterodactyl.test:192.168.50.3",
 			]
 			d.ports = ["80:80", "443:443", "8080:8080", "8081:8081"]
@@ -101,20 +100,6 @@ Vagrant.configure("2") do |config|
 		config.vm.provision "file", source: "~/.gitconfig", destination: ".gitconfig"
 	end
 
-	config.vm.define "daemon", autostart: false do |daemon|
-		daemon.vm.hostname = "daemon.pterodactyl.test"
-		daemon.vm.box = "bento/ubuntu-18.04"
-
-		daemon.vm.synced_folder ".", "/vagrant", disabled: true
-		daemon.vm.synced_folder "#{vagrant_root}/code/daemon", "/srv/daemon", owner: "vagrant", group: "vagrant"
-		daemon.vm.synced_folder "#{vagrant_root}/.data/certificates", "/etc/ssl/private", owner: "vagrant", group: "vagrant"
-		daemon.vm.synced_folder "#{vagrant_root}/code/sftp-server", "/home/vagrant/sftp-server", owner: "vagrant", group: "vagrant"
-
-		daemon.vm.network :private_network, ip: "192.168.50.4"
-
-		daemon.vm.provision "provision", type: "shell", path: "#{vagrant_root}/scripts/provision_daemon.sh"
-	end
-
 	config.vm.define "docs" do |docs|
 		docs.vm.hostname = "docs.pterodactyl.test"
 		docs.vm.synced_folder ".", "/vagrant", disabled: true
@@ -133,7 +118,7 @@ Vagrant.configure("2") do |config|
 			d.name = "pterodev_docs"
 
 			d.volumes = ["#{vagrant_root}/code/documentation:/home/vagrant/docs:cached"]
-			
+
 			d.remains_running = true
 			d.has_ssh = true
 			d.privileged = true

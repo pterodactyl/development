@@ -10,7 +10,10 @@ add-apt-repository ppa:longsleep/golang-backports
 
 # Perform the installation of the required software.
 apt -y update
-apt -y --no-install-recommends install tar zip unzip make gcc g++ python docker-ce docker-ce-cli containerd.io golang-go
+apt -y --no-install-recommends install tar zip unzip make gcc g++ gdb python docker-ce docker-ce-cli containerd.io golang-go
+
+# Install delve for Go debugging support.
+GOBIN=/usr/local/bin go get github.com/go-delve/delve/cmd/dlv
 
 # Configure the vagrant user to have permission to use Docker.
 usermod -aG docker vagrant
