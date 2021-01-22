@@ -6,17 +6,17 @@ LABEL maintainer="dane@daneeveritt.com" \
 
 ENV DEBIAN_FRONTEND=noninteractive \
 	NOTVISIBLE="in users profile" \
-    LANG=en_US.UTF-8 \ 
+    LANG=en_US.UTF-8 \
 	LANGUAGE=en_US:en \
 	LC_ALL=en_US.UTF-8
 
 RUN apt -y update \
 	&& apt -y upgrade \
-	&& apt -y --no-install-recommends install software-properties-common gpg-agent sudo openssh-server locales curl iproute2 lsb-release git \
+	&& apt -y --no-install-recommends install software-properties-common gpg-agent sudo openssh-server locales curl iproute2 iputils-ping lsb-release git \
 	&& sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen \
 	&& locale-gen \
 	&& useradd -m -s /bin/bash -p $(echo "vagrant" | openssl passwd -1 -stdin) vagrant \
-	&& echo 'ALL            ALL = (ALL) NOPASSWD: ALL' > /etc/sudoers \
+	&& echo 'ALL ALL = (ALL) NOPASSWD: ALL' > /etc/sudoers \
 	&& sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd \
 	&& echo "export VISIBLE=now" >> /etc/profile \
 	&& rm -rf /var/lib/apt/lists/*
