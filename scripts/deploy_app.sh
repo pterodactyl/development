@@ -37,7 +37,7 @@ sudo rm -f /srv/www
 sudo ln -s /home/vagrant/app /srv/www
 
 # Configure OPCache
-sudo cat | sudo tee -a /etc/php/7.4/cli/conf.d/10-opcache.ini > /dev/null <<EOF
+sudo cat | sudo tee -a /etc/php/8.0/cli/conf.d/10-opcache.ini > /dev/null <<EOF
 opcache.revalidate_freq = 0
 opcache.max_accelerated_files = 11003
 opcache.memory_consumption = 192
@@ -47,7 +47,7 @@ opcache.enable = 1
 opcache.enable_cli = 1
 EOF
 
-sudo cat | sudo tee -a /etc/php/7.4/fpm/conf.d/20-xdebug.ini > /dev/null <<EOF
+sudo cat | sudo tee -a /etc/php/8.0/fpm/conf.d/20-xdebug.ini > /dev/null <<EOF
 xdebug.remote_enable = 1
 xdebug.remote_host = host.docker.internal
 xdebug.remote_port = 9000

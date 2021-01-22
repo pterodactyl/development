@@ -10,7 +10,7 @@ add-apt-repository ppa:longsleep/golang-backports
 
 # Perform the installation of the required software.
 apt -y update
-apt -y --no-install-recommends install tar zip unzip make gcc g++ gdb python docker-ce docker-ce-cli containerd.io golang-go
+apt -y --no-install-recommends install iputils-ping tar zip unzip make gcc g++ gdb python docker-ce docker-ce-cli containerd.io golang-go
 
 # Install delve for Go debugging support.
 GOBIN=/usr/local/bin go get github.com/go-delve/delve/cmd/dlv
@@ -25,14 +25,9 @@ systemctl enable docker --now
 curl -fsSL https://github.com/bcicen/ctop/releases/download/v0.7.1/ctop-0.7.1-linux-amd64 -o /usr/local/bin/ctop
 chmod +x /usr/local/bin/ctop
 
-# Move certificates to sensible default locations
-cp /etc/ssl/pterodactyl/rootCA.pem /etc/ssl/certs/mkcert.pem
-mkdir -p /etc/letsencrypt/live/wings.pterodactyl.test/
-cp /etc/ssl/pterodactyl/pterodactyl.test.pem /etc/letsencrypt/live/wings.pterodactyl.test/fullchain.pem
-cp /etc/ssl/pterodactyl/pterodactyl.test-key.pem /etc/letsencrypt/live/wings.pterodactyl.test/privkey.pem
-
 # create config directory
-mkdir /etc/pterodactyl /var/log/pterodactyl
+mkdir -p /etc/pterodactyl /var/log/pterodactyl
+cp /etc/ssl/pterodactyl/root_ca.pem /etc/ssl/certs/mkcert.pem
 
 # ensure permissions are set correctly
 chown -R vagrant:vagrant /home/vagrant /etc/pterodactyl /var/log/pterodactyl
