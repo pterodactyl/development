@@ -139,11 +139,11 @@ Vagrant.configure("2") do |config|
 			d.image = "mysql:8"
 			d.ports = ["33060:3306"]
 			d.cmd = [
-				"--sql_mode=no_engine_substitution",
-				"--innodb_buffer_pool_size=1G",
-				"--innodb_log_file_size=256M",
-				"--innodb_flush_log_at_trx_commit=0",
-				"--lower_case_table_names=1"
+				"--sql-mode=no_engine_substitution",
+				"--innodb-buffer-pool-size=1G",
+				"--innodb-log-file-size=256M",
+				"--innodb-flush-log-at-trx-commit=0",
+				"--lower-case-table-names=1"
 			]
 			d.volumes = ["#{vagrant_root}/.data/mysql:/var/lib/mysql:cached"]
 			d.env = {
