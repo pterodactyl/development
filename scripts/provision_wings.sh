@@ -7,15 +7,17 @@ echo \
   "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/debian \
   $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 
-# Add support for easily fetching the latest version of Go
-add-apt-repository ppa:longsleep/golang-backports
-
 # Perform the installation of the required software.
 apt -y update
-apt -y --no-install-recommends install iputils-ping tar zip unzip make gcc g++ gdb python docker-ce docker-ce-cli containerd.io golang-go
+apt -y --no-install-recommends install iputils-ping tar zip unzip make gcc g++ gdb python docker-ce docker-ce-cli containerd.io
+
+curl -OL https://golang.org/dl/go1.16.5.linux-amd64.tar.gz
+tar xvf go1.16.5.linux-amd64.tar.gz -C /usr/local
+chown -R root:root /usr/local/go
+rm -rf go1.16.5.linux-amd64.tar.gz
 
 # Install delve for Go debugging support.
-GOBIN=/usr/local/bin go get github.com/go-delve/delve/cmd/dlv
+GOBIN=/usr/local/go/bin go get github.com/go-delve/delve/cmd/dlv
 
 # Configure the vagrant user to have permission to use Docker.
 usermod -aG docker vagrant
@@ -37,4 +39,6 @@ chown -R vagrant:vagrant /home/vagrant /etc/pterodactyl /var/log/pterodactyl
 # map pterodactyl.test to the host system
 echo "$(ip route | grep default | cut -d' ' -f3,3) pterodactyl.test" >> /etc/hosts
 
-echo "done."
+cat >> /etc/profile <<EOF
+export PATH=$PATH:/usr/local/go/bin
+EOF
