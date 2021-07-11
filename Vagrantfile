@@ -81,7 +81,7 @@ Vagrant.configure("2") do |config|
 
 	config.vm.define "wings", autostart: false do |wings|
 		wings.vm.hostname = "wings.pterodactyl.test"
-		wings.vm.box = "bento/ubuntu-18.04"
+		wings.vm.box = "generic/debian10"
 
         wings.vm.provider "virtualbox" do |v|
             v.memory = config("wings.memory", 2048)
