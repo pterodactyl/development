@@ -48,10 +48,9 @@ opcache.enable_cli = 1
 EOF
 
 sudo cat | sudo tee -a /etc/php/8.0/fpm/conf.d/20-xdebug.ini > /dev/null <<EOF
-xdebug.remote_enable = 1
-xdebug.remote_host = host.docker.internal
-xdebug.remote_port = 9000
-xdebug.idekey = PHPSTORM
+xdebug.mode=debug
+xdebug.client_host=host.docker.internal
+xdebug.client_port=9003
 EOF
 
 # Install development dependencies
