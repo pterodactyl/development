@@ -24,6 +24,12 @@ Once you already have everything setup for the app, you can simply run `vagrant 
 ### Daemons
 There are VMs for both, the old and the new, daemons configured. They do not start automatically. You can start them using `vagrant up daemon` (for the nodejs one) and `vagrant up wings` (the golang one).
 
+#### Wings
+Example Wings startup:
+```
+sudo /path/to/wings --debug --config=/path/to/config.yml
+```
+
 ### Updating /etc/hosts
 On your first run, and whenever the hostnames change, you'll have to run `vagrant hostmanager app --provider docker` to update your /etc/hosts file.
 
