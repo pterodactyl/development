@@ -1,0 +1,8 @@
+http:
+  middlewares:
+    compress:
+      compress:
+tls:
+  certificates:
+    - certFile: /etc/certs/pterodactyl.test.pem
+      keyFile: /etc/certs/pterodactyl.test-key.pem

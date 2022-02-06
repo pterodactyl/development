@@ -99,35 +99,6 @@ Vagrant.configure("2") do |config|
 		config.vm.provision "file", source: "~/.gitconfig", destination: ".gitconfig"
 	end
 
-	config.vm.define "docs" do |docs|
-		docs.vm.hostname = "docs.pterodactyl.test"
-		docs.vm.synced_folder ".", "/vagrant", disabled: true
-
-		docs.vm.network "forwarded_port", guest: 80, host: 9090
-		docs.vm.network "forwarded_port", guest: 9091, host: 9091
-
-		docs.ssh.insert_key = true
-		docs.ssh.username = "vagrant"
-		docs.ssh.password = "vagrant"
-
-		docs.vm.provider "docker" do |d|
-			d.image = "ghcr.io/pterodactyl/development/base"
-			d.create_args = ["-it", "--add-host=host.pterodactyl.test:172.17.0.1"]
-			d.ports = ["9090:80", "9091:9091"]
-			d.name = "pterodev_docs"
-
-			d.volumes = ["#{vagrant_root}/code/documentation:/home/vagrant/docs:cached"]
-
-			d.remains_running = true
-			d.has_ssh = true
-			d.privileged = true
-		end
-
-		docs.vm.provision "deploy_files", type: "file", source: "#{vagrant_root}/build/configs", destination: "/tmp/.deploy"
-		docs.vm.provision "setup_documentation", type: "shell", privileged: false, path: "#{vagrant_root}/scripts/deploy_docs.sh"
-	end
-
-
 	# Configure a mysql docker container.
 	config.vm.define "mysql" do |mysql|
 		mysql.vm.hostname = "mysql.pterodactyl.test"
@@ -152,37 +123,6 @@ Vagrant.configure("2") do |config|
 				"MYSQL_USER": "pterodactyl",
 				"MYSQL_PASSWORD": "pterodactyl"
 			}
-			d.remains_running = true
-		end
-	end
-
-	config.vm.define "chromedriver" do |chrome|
-		chrome.vm.hostname = "chromedriver.pterodactyl.test"
-		chrome.vm.synced_folder ".", "/vagrant", disabled: true
-
-		chrome.vm.network "forwarded_port", guest: 4444, host: 4444
-		chrome.vm.network "forwarded_port", guest: 5900, host: 5900
-
-		chrome.vm.provider "docker" do |d|
-			d.image = "selenium/standalone-chrome-debug:3.12.0-boron"
-			d.ports = ["5900:5900", "4444:4444"]
-			d.create_args = ["--add-host=pterodactyl.test:172.17.0.1"]
-			d.remains_running = true
-		end
-	end
-
-	# Create a docker container for mailhog which providers a local SMTP environment that avoids actually
-	# sending emails to the address.
-	config.vm.define "mailhog" do |mh|
-		mh.vm.hostname = "mailhog.pterodactyl.test"
-		mh.vm.synced_folder ".", "/vagrant", disabled: true
-
-		mh.vm.network "forwarded_port", guest: 1025, host: 1025
-		mh.vm.network "forwarded_port", guest: 8025, host: 8025
-
-		mh.vm.provider "docker" do |d|
-			d.image = "mailhog/mailhog"
-			d.ports = ["1025:1025", "8025:8025"]
 			d.remains_running = true
 		end
 	end

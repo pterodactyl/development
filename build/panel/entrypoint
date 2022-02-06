@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+set -x
+if [ -d "/etc/php/mods-available"]; then
+  if [ -d "/etc/php/mods-available/cli" ]; then
+    sudo ln -s /etc/php/mods-available/cli/* /etc/php/8.0/cli/conf.d
+  fi
+  if [ -d "/etc/php/mods-available/fpm" ]; then
+    sudo ln -s /etc/php/mods-available/fpm/* /etc/php/8.0/fpm/conf.d
+  fi
+  find . -maxdepth 1 -type f -print0 | while read -d $'\0' file
+  do
+    sudo ln -s "$file" /etc/php/8.0/cli/conf.d/
+    sudo ln -s "$file" /etc/php/8.0/fpm/conf.d/
+  done
+fi
+
+cd /var/www/html || exit 1
+#sudo chown -R pterodactyl:pterodactyl *
+#sudo chown -R www-data:pterodactyl storage
+#sudo chmod -R 775 storage/* bootstrap/cache
+
+if [ $# -gt 0 ]; then
+  sudo su -c "/bin/bash"
+else
+  sudo service cron start
+  sudo /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
+fi

@@ -1,0 +1,17 @@
+global:
+  sendAnonymousUsage: false
+api:
+  insecure: true
+  dashboard: true
+entryPoints:
+  https:
+    address: ":443"
+providers:
+  file:
+    filename: /etc/traefik/dynamic.yml
+    watch: true
+  docker:
+    endpoint: unix:///var/run/docker.sock
+    exposedByDefault: false
+    network: pterodactyl
+

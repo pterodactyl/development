@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+cd /var/www/html || exit 1
+
+if [ ! -f ".env" ]; then
+  cp .env.example .env
+fi
+
+sed -i "s/APP_ENV=.*/APP_ENV=local/" .env
+sed -i "s/APP_DEBUG=.*/APP_DEBUG=true/" .env
+
+composer install --no-interaction --prefer-dist --no-scripts --no-progress
+php artisan config:clear
+yarn install --no-progress
+
+sudo chown -R pterodactyl:pterodactyl *
+sudo chown -R www-data:pterodactyl storage
+sudo chmod -R 775 storage/* bootstrap/cache
+
+sudo supervisorctl reread
+sudo supervisorctl update
+sudo supervisorctl start pteroq:*
+sudo supervisorctl restart nginx
