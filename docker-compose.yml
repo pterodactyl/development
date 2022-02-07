@@ -33,6 +33,20 @@ services:
       - "traefik.http.routers.app.rule=Host(`pterodactyl.test`)"
       - "traefik.http.routers.app.entrypoints=https"
       - "traefik.http.services.app.loadbalancer.server.port=80"
+  wings:
+    build:
+      context: ./build/wings
+      dockerfile: Dockerfile
+    tty: true
+    stdin_open: true
+    networks:
+      pterodactyl:
+        aliases:
+          - wings.pterodactyl.test
+    volumes:
+      - ./code/wings:/home/root/wings:cached
+      - wings-data:/var/lib/pterodactyl:delegated
+      - /var/run/docker.sock:/var/run/docker.sock:ro
   mysql:
     image: mariadb:10.7
     restart: unless-stopped
@@ -95,4 +109,6 @@ volumes:
   mysql:
     driver: local
   minio:
+    driver: local
+  wings-data:
     driver: local
