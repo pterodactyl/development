@@ -1,17 +1,44 @@
 #!/bin/bash
+SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
+CERTS_DIR="$SCRIPT_DIR/docker/certificates"
+CODE_DIR="$SCRIPT_DIR/code"
 
-CURRENT_DIRECTORY="$(pwd)"
-cd /tmp
-
-cd ${CURRENT_DIRECTORY}
-
-git clone https://github.com/pterodactyl/panel.git code/panel
-git clone https://github.com/pterodactyl/documentation.git code/documentation
-git clone https://github.com/pterodactyl/wings.git code/wings
+for REPO in "panel" "documentation" "wings"
+do
+  if [ ! -d "$CODE_DIR/$REPO" ]; then
+    git clone https://github.com/pterodactyl/$REPO.git "$CODE_DIR/$REPO"
+  else
+    echo "$REPO repository already cloned into: $CODE_DIR/$REPO"
+  fi
+done
 
 mkcert -install
-mkcert pterodactyl.test '*.pterodactyl.test'
+mkcert pterodactyl.test hmr.pterodactyl.test minio.pterodactyl.test s3.minio.pterodactyl.test
 
-mv *pterodactyl.test*-key.pem docker/certificates/pterodactyl.test-key.pem
-mv *pterodactyl.test*.pem docker/certificates/pterodactyl.test.pem
-cp "$(mkcert -CAROOT)/rootCA.pem" docker/certificates/root_ca.pem
+mv -v *pterodactyl.test*-key.pem docker/certificates/pterodactyl.test-key.pem || exit 1
+mv -v *pterodactyl.test*.pem docker/certificates/pterodactyl.test.pem || exit 1
+cp -v "$(mkcert -CAROOT)/rootCA.pem" docker/certificates/root_ca.pem || exit 1
+
+echo ""
+if [ ! -f "/etc/hosts" ]; then
+  echo "no system hosts file found, please manually configure your system"
+else
+  for DOMAIN in "pterodactyl.test" "hmr.pterodactyl.test" "minio.pterodactyl.test" "s3.minio.pterodactyl.test"
+  do
+    ESCAPED_DOMAIN=$(echo $DOMAIN | sed "s/\./\\\./g")
+    if ! grep -q -E "127\.0\.0\.1\s+$ESCAPED_DOMAIN\s*$" /etc/hosts; then
+      echo "✅ adding \"$DOMAIN\" to system hosts file"
+      echo "127.0.0.1 $DOMAIN" | sudo tee -a /etc/hosts || exit 1
+    else
+      echo "✅ found existing entry for \"$DOMAIN\" in /etc/hosts; skipping..."
+    fi
+  done
+fi
+
+echo "optionally, configure the beak alias:"
+
+echo "bash:"
+echo "echo \"alias beak=\\\"$SCRIPT_DIR/beak\\\"\" >> ~/.bash_profile"
+echo ""
+echo "zsh:"
+echo "echo \"alias beak=\\\"$SCRIPT_DIR/beak\\\"\" >> ~/.zshrc"

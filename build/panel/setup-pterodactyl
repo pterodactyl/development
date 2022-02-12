@@ -12,8 +12,6 @@ composer install --no-interaction --prefer-dist --no-scripts --no-progress
 php artisan config:clear
 yarn install --no-progress
 
-sudo chown -R pterodactyl:pterodactyl *
-sudo chown -R www-data:pterodactyl storage
 sudo chmod -R 775 storage/* bootstrap/cache
 
 sudo supervisorctl reread

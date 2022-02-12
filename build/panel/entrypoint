@@ -14,10 +14,16 @@ if [ -d "/etc/php/mods-available"]; then
   done
 fi
 
+if [ -d "/etc/certs" ]; then
+  sudo mkdir -p /usr/local/share/ca-certificates/mkcert
+  sudo cp /etc/certs/pterodactyl*.pem /usr/local/share/ca-certificates/mkcert/
+  sudo update-ca-certificates
+fi
+
 cd /var/www/html || exit 1
 #sudo chown -R pterodactyl:pterodactyl *
 #sudo chown -R www-data:pterodactyl storage
-#sudo chmod -R 775 storage/* bootstrap/cache
+sudo chmod -R 775 storage/* bootstrap/cache
 
 if [ $# -gt 0 ]; then
   sudo su -c "/bin/bash"

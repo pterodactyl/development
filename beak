@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+if [ "$1" == "app" ]; then
+  if [ "$2" == "" ]; then
+    docker compose exec -u pterodactyl app bash
+  elif [ "$2" == "root" ]; then
+    docker compose exec -u root app bash
+  else
+    echo "./beak.sh app [root]"
+    exit 1
+  fi
+elif [ "$1" == "wings" ]; then
+  docker compose exec -u root wings bash
+elif [ "$1" == "up" ]; then
+  shift
+  mutagen-compose up $@
+elif [ "$1" == "down" ]; then
+  shift
+  mutagen-compose down $@
+else
+  echo "./beak.sh <up|down|wings|app> [root]"
+  exit 1
+fi

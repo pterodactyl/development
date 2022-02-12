@@ -48,14 +48,14 @@ RUN apt -y update \
 	&& rm -rf /var/lib/apt/lists/*
 
 COPY entrypoint /usr/local/bin/entrypoint
-COPY setup /usr/local/bin/setup
+COPY setup-pterodactyl /usr/local/bin/setup-pterodactyl
 COPY configs/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY configs/pterodactyl.conf /etc/nginx/sites-available/pterodactyl.conf
 
 RUN useradd -m pterodactyl \
     && usermod -a -g www-data -G sudo pterodactyl \
     && echo "pterodactyl  ALL=(ALL) NOPASSWD:ALL" | tee /etc/sudoers.d/pterodactyl \
-    && chmod +x /usr/local/bin/setup \
+    && chmod +x /usr/local/bin/setup-pterodactyl \
     && chmod +x /usr/local/bin/entrypoint \
     && rm -rf /etc/nginx/sites-enabled/* \
     && ln -s /etc/nginx/sites-available/pterodactyl.conf /etc/nginx/sites-enabled/ \
@@ -67,6 +67,7 @@ RUN useradd -m pterodactyl \
 WORKDIR /var/www/html
 
 EXPOSE 80
+EXPOSE 8080
 USER pterodactyl
 
 ENTRYPOINT ["entrypoint"]

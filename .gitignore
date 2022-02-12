@@ -1,10 +1,5 @@
-.vagrant/
 **/.DS_Store
-.data/
-.docker-sync/**
 .idea
 
-# intended for per-machine config
-vagrant.config.yml
 docker/certificates/*
 !docker/certificates/.gitkeep

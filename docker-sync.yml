@@ -1,7 +1,0 @@
-version: "2"
-syncs:
-  panel-sync:
-    sync_strategy: "native_osx"
-    src: "./code/panel/"
-    sync_excludes: [".idea", ".git", ".vagrant", "node_modules"]
-    host_disk_mount_mode: "cached"

@@ -5,7 +5,12 @@ services:
     image: traefik:2.6
     restart: always
     networks:
-      - pterodactyl
+      pterodactyl:
+        aliases:
+          - pterodactyl.test
+          - minio.pterodactyl.test
+          - s3.minio.pterodactyl.test
+          - wings.pterodactyl.test
     ports:
       - "443:443"
       - "8080:8080"
@@ -13,40 +18,54 @@ services:
       - no-new-privileges=true
     volumes:
       - ./traefik:/etc/traefik:ro
-      - ./.data/certificates:/etc/certs:ro
+      - ./docker/certificates:/etc/certs:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
   app:
     build:
       context: ./build/panel
       dockerfile: Dockerfile
+    stop_grace_period: '1s'
     networks:
       pterodactyl:
         aliases:
           - pterodactyl.test
     volumes:
-      - ./code/panel:/var/www/html:cached
-      - ./docker/certificates:/etc/ssl/private:ro
+      - panel_code:/var/www/html
+      - ./docker/certificates:/etc/certs:ro
       - ./docker/php:/etc/php/mods-available:ro
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.app.tls=true"
       - "traefik.http.routers.app.rule=Host(`pterodactyl.test`)"
       - "traefik.http.routers.app.entrypoints=https"
+      - "traefik.http.routers.app.service=app"
       - "traefik.http.services.app.loadbalancer.server.port=80"
+      - "traefik.http.routers.hmr.tls=true"
+      - "traefik.http.routers.hmr.rule=Host(`hmr.pterodactyl.test`)"
+      - "traefik.http.routers.hmr.entrypoints=https"
+      - "traefik.http.routers.hmr.service=hmr"
+      - "traefik.http.services.hmr.loadbalancer.server.port=8080"
   wings:
     build:
       context: ./build/wings
       dockerfile: Dockerfile
+    stop_grace_period: '1s'
     tty: true
     stdin_open: true
     networks:
-      pterodactyl:
-        aliases:
-          - wings.pterodactyl.test
+      - pterodactyl
+    ports:
+      - "2022:2022"
     volumes:
-      - ./code/wings:/home/root/wings:cached
-      - wings-data:/var/lib/pterodactyl:delegated
+      - ./code/wings:/home/root/wings
+      - wings_data:/var/lib/pterodactyl
       - /var/run/docker.sock:/var/run/docker.sock:ro
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.wings.tls=true"
+      - "traefik.http.routers.wings.rule=Host(`wings.pterodactyl.test`)"
+      - "traefik.http.routers.wings.entrypoints=https"
+      - "traefik.http.services.wings.loadbalancer.server.port=8080"
   mysql:
     image: mariadb:10.7
     restart: unless-stopped
@@ -58,7 +77,7 @@ services:
       - --innodb-flush-log-at-trx-commit=0
       - --lower-case-table-names=1
     volumes:
-      - mysql:/var/lib/mysql:delegated
+      - mysql:/var/lib/mysql
       - ./docker/mysql:/docker-entrypoint-initdb.d:ro
     environment:
       MYSQL_ROOT_PASSWORD: root
@@ -87,7 +106,7 @@ services:
         aliases:
           - s3.minio.pterodactyl.test
     volumes:
-      - minio:/var/lib/minio:delegated
+      - minio:/var/lib/minio
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.minio.tls=true"
@@ -106,9 +125,25 @@ networks:
     driver: bridge
 
 volumes:
+  panel_code:
   mysql:
     driver: local
   minio:
     driver: local
-  wings-data:
+  wings_data:
     driver: local
+
+x-mutagen:
+  sync:
+    defaults:
+      permissions:
+        defaultFileMode: 0666
+        defaultDirectoryMode: 0777
+    code:
+      alpha: "./code/panel"
+      beta: "volume://panel_code"
+      mode: "two-way-resolved"
+      ignore:
+        vcs: true
+        paths:
+          - ".idea"
