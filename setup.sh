@@ -13,7 +13,7 @@ do
 done
 
 mkcert -install
-mkcert pterodactyl.test hmr.pterodactyl.test minio.pterodactyl.test s3.minio.pterodactyl.test
+mkcert pterodactyl.test wings.pterodactyl.test minio.pterodactyl.test s3.minio.pterodactyl.test
 
 mv -v *pterodactyl.test*-key.pem docker/certificates/pterodactyl.test-key.pem || exit 1
 mv -v *pterodactyl.test*.pem docker/certificates/pterodactyl.test.pem || exit 1
@@ -23,7 +23,7 @@ echo ""
 if [ ! -f "/etc/hosts" ]; then
   echo "no system hosts file found, please manually configure your system"
 else
-  for DOMAIN in "pterodactyl.test" "hmr.pterodactyl.test" "minio.pterodactyl.test" "s3.minio.pterodactyl.test"
+  for DOMAIN in "pterodactyl.test" "wings.pterodactyl.test" "minio.pterodactyl.test" "s3.minio.pterodactyl.test"
   do
     ESCAPED_DOMAIN=$(echo $DOMAIN | sed "s/\./\\\./g")
     if ! grep -q -E "127\.0\.0\.1\s+$ESCAPED_DOMAIN\s*$" /etc/hosts; then

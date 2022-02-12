@@ -21,8 +21,7 @@ if [ -d "/etc/certs" ]; then
 fi
 
 cd /var/www/html || exit 1
-#sudo chown -R pterodactyl:pterodactyl *
-#sudo chown -R www-data:pterodactyl storage
+sudo chown -R www-data:pterodactyl storage
 sudo chmod -R 775 storage/* bootstrap/cache
 
 if [ $# -gt 0 ]; then
