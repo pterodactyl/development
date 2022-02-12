@@ -36,5 +36,3 @@ EXPOSE 8080
 EXPOSE 2022
 
 WORKDIR /home/root/wings
-
-CMD ["/bin/bash"]

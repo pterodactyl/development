@@ -54,11 +54,12 @@ services:
     stdin_open: true
     networks:
       - pterodactyl
-#    ports:
-#      - "2022:2022"
+    ports:
+      - "2022:2022"
     volumes:
       - ./code/wings:/home/root/wings
-      - wings_data:/var/lib/pterodactyl
+      - go_modules:/root/go
+      - /var/lib/pterodactyl:/var/lib/pterodactyl
       - /var/run/docker.sock:/var/run/docker.sock:ro
     labels:
       - "traefik.enable=true"
@@ -130,7 +131,7 @@ volumes:
     driver: local
   minio:
     driver: local
-  wings_data:
+  go_modules:
     driver: local
 
 x-mutagen:
