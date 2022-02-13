@@ -18,16 +18,16 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.REGISTRY_TOKEN }}
 
-      - name: Base image
+      - name: build Panel image
         uses: docker/build-push-action@v2
         with:
-          file: build/Dockerfile-base
-          push: true
-          tags: ghcr.io/pterodactyl/development/base:latest
-
-      - name: Panel image
-        uses: docker/build-push-action@v2
-        with:
-          file: build/Dockerfile-panel
+          file: build/panel/Dockerfile
           push: true
           tags: ghcr.io/pterodactyl/development/panel:latest
+
+      - name: build Wings image
+        uses: docker/build-push-action@v2
+        with:
+          file: build/wings/Dockerfile
+          push: true
+          tags: ghcr.io/pterodactyl/development/wings:latest
