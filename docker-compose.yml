@@ -59,6 +59,7 @@ services:
     volumes:
       - ./code/wings:/home/root/wings
       - go_modules:/root/go
+      - /tmp/pterodactyl:/tmp/pterodactyl
       - /var/lib/pterodactyl:/var/lib/pterodactyl
       - /var/run/docker.sock:/var/run/docker.sock:ro
     labels:
