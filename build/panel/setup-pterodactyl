@@ -14,7 +14,6 @@ yarn install --no-progress
 
 sudo chmod -R 775 storage/* bootstrap/cache
 
-sudo supervisorctl reread
-sudo supervisorctl update
-sudo supervisorctl start pteroq:*
-sudo supervisorctl restart nginx
+sudo service cron restart
+# Forces supervisord to restart all of the processes with updated configurations.
+sudo killall php-fpm8.0 php nginx

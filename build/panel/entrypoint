@@ -28,5 +28,5 @@ if [ $# -gt 0 ]; then
   sudo su -c "/bin/bash"
 else
   sudo service cron start
-  sudo /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
+  sudo /usr/bin/supervisord -c /etc/supervisord.conf -n
 fi

@@ -1,7 +1,7 @@
 FROM debian:11-slim
 
 LABEL maintainer="dane@daneeveritt.com" \
-	  description="Docker image allowing Pterodactyl Panel to run using Vagrant." \
+	  description="Local development environment for Pterodactyl Panel." \
 	  org.opencontainers.image.source=https://github.com/pterodactyl/development
 
 ENV DEBIAN_FRONTEND noninteractive \
@@ -49,7 +49,7 @@ RUN apt -y update \
 
 COPY entrypoint /usr/local/bin/entrypoint
 COPY setup-pterodactyl /usr/local/bin/setup-pterodactyl
-COPY configs/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY configs/supervisord.conf /etc/supervisord.conf
 COPY configs/pterodactyl.conf /etc/nginx/sites-available/pterodactyl.conf
 
 RUN useradd -m pterodactyl \
