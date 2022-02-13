@@ -22,7 +22,7 @@ fi
 
 cd /var/www/html || exit 1
 sudo chown -R www-data:pterodactyl storage
-sudo chmod -R 775 storage/* bootstrap/cache
+sudo chmod -R 777 storage/* bootstrap/cache
 
 if [ $# -gt 0 ]; then
   sudo su -c "/bin/bash"
