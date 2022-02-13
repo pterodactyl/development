@@ -21,13 +21,15 @@ jobs:
       - name: build Panel image
         uses: docker/build-push-action@v2
         with:
-          file: build/panel/Dockerfile
           push: true
+          platforms: linux/amd64,linux/arm64
+          context: build/panel
           tags: ghcr.io/pterodactyl/development/panel:latest
 
       - name: build Wings image
         uses: docker/build-push-action@v2
         with:
-          file: build/wings/Dockerfile
           push: true
+          platforms: linux/amd64,linux/arm64
+          context: build/wings
           tags: ghcr.io/pterodactyl/development/wings:latest
