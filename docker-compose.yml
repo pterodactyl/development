@@ -21,9 +21,10 @@ services:
       - ./docker/certificates:/etc/certs:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
   app:
-    build:
-      context: ./build/panel
-      dockerfile: Dockerfile
+    image: ghcr.io/pterodactyl/development/panel:latest
+    # build:
+    #   context: ./build/panel
+    #   dockerfile: Dockerfile
     stop_grace_period: '1s'
     networks:
       pterodactyl:
@@ -46,9 +47,10 @@ services:
       - "traefik.http.routers.webpack-dev-server.service=webpack-dev-server"
       - "traefik.http.services.webpack-dev-server.loadbalancer.server.port=8080"
   wings:
-    build:
-      context: ./build/wings
-      dockerfile: Dockerfile
+    image: ghcr.io/pterodactyl/development/wings:latest
+    # build:
+    #   context: ./build/wings
+    #   dockerfile: Dockerfile
     stop_grace_period: '1s'
     tty: true
     stdin_open: true
