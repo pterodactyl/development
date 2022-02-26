@@ -31,18 +31,18 @@ RUN apt -y update \
         nodejs \
         yarn \
         nano \
-	&& apt -y --no-install-recommends install php8.0 \
-		php8.0-cli \
-		php8.0-common \
-		php8.0-gd \
-		php8.0-mysql \
-		php8.0-mbstring \
-		php8.0-bcmath \
-		php8.0-xml \
-		php8.0-fpm \
-		php8.0-curl \
-		php8.0-zip \
-		php8.0-xdebug \
+	&& apt -y --no-install-recommends install php8.1 \
+		php8.1-cli \
+		php8.1-common \
+		php8.1-gd \
+		php8.1-mysql \
+		php8.1-mbstring \
+		php8.1-bcmath \
+		php8.1-xml \
+		php8.1-fpm \
+		php8.1-curl \
+		php8.1-zip \
+		php8.1-xdebug \
 	&& curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
 	&& apt autoremove -y \
 	&& rm -rf /var/lib/apt/lists/*
