@@ -31,7 +31,7 @@ services:
         aliases:
           - pterodactyl.test
     volumes:
-      - panel_code:/var/www/html
+      - ./code/panel:/var/www/html
       - ./docker/certificates:/etc/certs:ro
       - ./docker/php:/etc/php/mods-available:ro
     labels:
@@ -46,6 +46,14 @@ services:
       - "traefik.http.routers.webpack-dev-server.entrypoints=https"
       - "traefik.http.routers.webpack-dev-server.service=webpack-dev-server"
       - "traefik.http.services.webpack-dev-server.loadbalancer.server.port=8080"
+    environment:
+      APP_URL: https://pterodactyl.test
+      DB_HOST: mysql
+      REDIS_HOST: redis
+      DB_USERNAME: pterodactyl
+      DB_PASSWORD: pterodactyl
+      SESSION_DRIVER: redis
+      CACHE_DRIVER: redis
   wings:
     image: ghcr.io/pterodactyl/development/wings:latest
     # build:
@@ -129,25 +137,9 @@ networks:
     driver: bridge
 
 volumes:
-  panel_code:
   mysql:
     driver: local
   minio:
     driver: local
   go_modules:
     driver: local
-
-x-mutagen:
-  sync:
-    defaults:
-      permissions:
-        defaultFileMode: 0666
-        defaultDirectoryMode: 0777
-    code:
-      alpha: "./code/panel"
-      beta: "volume://panel_code"
-      mode: "two-way-resolved"
-      ignore:
-        vcs: true
-        paths:
-          - ".idea"

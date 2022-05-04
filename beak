@@ -12,10 +12,10 @@ elif [ "$1" == "wings" ]; then
   docker compose exec -u root wings bash
 elif [ "$1" == "up" ]; then
   shift
-  mutagen-compose up $@
+  docker compose up $@
 elif [ "$1" == "down" ]; then
   shift
-  mutagen-compose down $@
+  docker compose down $@
 else
   echo "./beak.sh <up|down|wings|app> [root]"
   exit 1
