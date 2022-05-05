@@ -1,8 +1,8 @@
 FROM debian:11-slim
 
-ENV DEBIAN_FRONTEND noninteractive \
-    LANG C.UTF-8 \
-    GOBIN /usr/local/go/bin
+ENV DEBIAN_FRONTEND=noninteractive
+ENV LANG=C.UTF-8
+ENV GOBIN=/usr/local/go/bin
 
 USER root
 RUN apt -y update \
@@ -15,6 +15,7 @@ RUN apt -y update \
         iputils-ping \
         tar \
         zip \
+        nano \
         unzip \
         make \
         gcc \
@@ -24,6 +25,8 @@ RUN apt -y update \
         docker-ce \
         docker-ce-cli \
         containerd.io \
+        iproute2 \
+        net-tools \
     && curl -OL "https://go.dev/dl/go1.17.6.linux-$(dpkg --print-architecture).tar.gz" \
     && tar xvf "go1.17.6.linux-$(dpkg --print-architecture).tar.gz" -C /usr/local \
     && chown -R root:root /usr/local/go \
