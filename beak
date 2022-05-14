@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+
+export WWWUSER=${WWWUSER:-$UID}
+export WWWGROUP=${WWWGROUP:-$(id -g)}
+
 if [ "$1" == "app" ]; then
   if [ "$2" == "" ]; then
     docker compose exec -u pterodactyl app bash
@@ -12,10 +16,10 @@ elif [ "$1" == "wings" ]; then
   docker compose exec -u root wings bash
 elif [ "$1" == "up" ]; then
   shift
-  docker compose up $@
+  mutagen-compose up $@
 elif [ "$1" == "down" ]; then
   shift
-  docker compose down $@
+  mutagen-compose down $@
 else
   echo "./beak.sh <up|down|wings|app> [root]"
   exit 1

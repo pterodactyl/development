@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 set -x
+
+if [ ! -z "$WWWUSER" ]; then
+  sudo usermod -u $WWWUSER pterodactyl
+fi
+
 if [ -d "/etc/php/mods-available"]; then
   if [ -d "/etc/php/mods-available/cli" ]; then
     sudo ln -s /etc/php/mods-available/cli/* /etc/php/8.1/cli/conf.d
