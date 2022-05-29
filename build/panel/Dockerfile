@@ -54,7 +54,7 @@ COPY configs/pterodactyl.conf /etc/nginx/sites-available/pterodactyl.conf
 
 RUN useradd -m pterodactyl \
     && usermod -a -g www-data -G sudo pterodactyl \
-    && echo "pterodactyl  ALL=(ALL) NOPASSWD:ALL" | tee /etc/sudoers.d/pterodactyl \
+    && echo "%sudo ALL=(ALL:ALL) NOPASSWD: ALL" | tee /etc/sudoers.d/sudoers \
     && chmod +x /usr/local/bin/setup-pterodactyl \
     && chmod +x /usr/local/bin/entrypoint \
     && rm -rf /etc/nginx/sites-enabled/* \
@@ -68,6 +68,5 @@ WORKDIR /var/www/html
 
 EXPOSE 80
 EXPOSE 8080
-USER pterodactyl
 
 ENTRYPOINT ["entrypoint"]
