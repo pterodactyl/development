@@ -1,26 +1,54 @@
 #!/usr/bin/env bash
 
+# If the environment file for the Panel exists we want to source it so
+# that any environment variables defined within that are passed along to
+# additional commands we may call here.
+if [ -f ./code/panel/.env ]; then
+  source ./code/panel/.env
+fi
+
 export WWWUSER=${WWWUSER:-$UID}
 export WWWGROUP=${WWWGROUP:-$(id -g)}
 
-if [ "$1" == "app" ]; then
-  if [ "$2" == "" ]; then
-    docker compose exec -u pterodactyl app bash
-  elif [ "$2" == "root" ]; then
-    docker compose exec -u root app bash
-  else
-    echo "./beak.sh app [root]"
-    exit 1
-  fi
-elif [ "$1" == "wings" ]; then
-  docker compose exec -u root wings bash
-elif [ "$1" == "up" ]; then
-  shift
-  mutagen-compose up $@
-elif [ "$1" == "down" ]; then
-  shift
-  mutagen-compose down $@
+if ! docker compose &>/dev/null; then
+  DOCKER_COMPOSE=(docker-compose)
 else
-  echo "./beak.sh <up|down|wings|app> [root]"
-  exit 1
+  DOCKER_COMPOSE=(docker compose)
 fi
+
+ARGS=()
+PEXEC=(exec -u pterodactyl app)
+
+# Handle SSH into the container for the Panel.
+if [ "$1" == "app" ]; then
+  shift 1
+  CONTAINER_USER=pterodactyl
+  if [ "$1" == "root" ]; then
+    CONTAINER_USER=root
+  fi
+  ARGS+=(exec -u "$CONTAINER_USER" app bash)
+
+# Boot into the wings instance.
+elif [ "$1" == "wings" ]; then
+  shift 1
+  "${DOCKER_COMPOSE[@]}" exec -u root wings bash
+
+# Start an artisan instance within the container.
+elif [ "$1" == "artisan" ]; then
+  shift 1
+  ARGS+=("${PEXEC[@]}" php artisan "$@")
+
+# Handle tinker commands.
+elif [ "$1" == "tinker" ]; then
+  shift 1
+  ARGS+=("${PEXEC[@]}" php artisan tinker)
+
+elif [ "$1" == "serve" ]; then
+  shift 1
+  ARGS+=("${PEXEC[@]}" yarn run serve "$@")
+
+else
+  ARGS+=("$@")
+fi
+
+"${DOCKER_COMPOSE[@]}" "${ARGS[@]}"
