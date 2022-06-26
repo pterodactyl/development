@@ -41,5 +41,5 @@ run through the normal setup process for the Panel if you do not have a database
 already. This can be done by SSH'ing into the Panel environment and running `setup-pterodactyl`.
 
 The code for the setup can be found in `build/panel/setup-pterodactyl`. Please note, this environment uses
-Mutagen for file handling, so replace calls to `docker compse up` or `down` with `mutagen-compose up` or `down`.
+Mutagen for file handling, so replace calls to `docker compose up` or `down` with `mutagen-compose up` or `down`.
 All other `docker compose` commands can be used as normal.
