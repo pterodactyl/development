@@ -43,3 +43,18 @@ already. This can be done by SSH'ing into the Panel environment and running `set
 The code for the setup can be found in `build/panel/setup-pterodactyl`. Please note, this environment uses
 Mutagen for file handling, so replace calls to `docker compse up` or `down` with `mutagen-compose up` or `down`.
 All other `docker compose` commands can be used as normal.
+
+### Setting up a node on the panel and configuring wings
+When creating the node on the panel, please make sure that:
+* FQDN is set to `wings.pterodactyl.test`
+* Set to use a SSL connection
+* Daemon port is `443` (NOT 8080)
+
+Next go to the configuration tab of the node, and copy the configuration and save it as `config.yml` under the wings code directory `./code/wings/`
+
+In the saved file `config.yml` you need to:
+* `Disable SSL` (Traefik is handling SSL)
+* Set the port to `8080`
+
+To start wings, run `./beaks wings`, and run `make debug`
+
