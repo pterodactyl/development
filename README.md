@@ -56,5 +56,5 @@ In the saved file `config.yml` you need to:
 * `Disable SSL` (Traefik is handling SSL)
 * Set the port to `8080`
 
-To start wings, run `./beaks wings`, and run `make debug`
+To start wings, run `./beak wings`, and run `make debug`
 
