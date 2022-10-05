@@ -1,12 +1,13 @@
-name: Build and publish docker images
+name: Panel
+
 on:
   push:
     branches:
       - 'master'
 
 jobs:
-  images:
-    name: Build and push base image
+  build-and-push:
+    name: Build and Push 
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -18,18 +19,10 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.REGISTRY_TOKEN }}
 
-      - name: build Panel image
+      - name: Build and Push image
         uses: docker/build-push-action@v2
         with:
           push: true
           platforms: linux/amd64,linux/arm64
           context: build/panel
           tags: ghcr.io/pterodactyl/development/panel:latest
-
-      - name: build Wings image
-        uses: docker/build-push-action@v2
-        with:
-          push: true
-          platforms: linux/amd64,linux/arm64
-          context: build/wings
-          tags: ghcr.io/pterodactyl/development/wings:latest

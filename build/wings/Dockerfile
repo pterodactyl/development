@@ -31,7 +31,7 @@ RUN apt -y update \
     && tar xvf "go1.18.7.linux-$(dpkg --print-architecture).tar.gz" -C /usr/local \
     && chown -R root:root /usr/local/go \
     && rm -rf go*.gz \
-    && /usr/local/go/bin/go get github.com/go-delve/delve/cmd/dlv \
+    && /usr/local/go/bin/go install github.com/go-delve/delve/cmd/dlv@latest \
     && usermod -aG docker root \
     && echo "export PATH=\$PATH:/usr/local/go/bin" >> /etc/bash.bashrc
 
