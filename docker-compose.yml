@@ -81,6 +81,11 @@ services:
       - "traefik.http.routers.wings.rule=Host(`wings.pterodactyl.test`)"
       - "traefik.http.routers.wings.entrypoints=https"
       - "traefik.http.services.wings.loadbalancer.server.port=8080"
+    cap_add:
+      - SYS_ADMIN
+    devices:
+      - /dev/loop0
+      - /dev/loop-control
   mysql:
     image: mariadb:10.7
     restart: unless-stopped
