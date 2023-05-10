@@ -12,7 +12,6 @@ PRs or Issues as necessary to improve this environment.
 You'll need the following things installed on your machine.
 
 * [Docker](https://docker.io)
-* [Mutagen Compose](https://github.com/mutagen-io/mutagen-compose)
 * [mkcert](https://github.com/FiloSottile/mkcert)
 
 ### Setup
@@ -40,6 +39,4 @@ Wings environments respectively. Your Panel is accessible at `https://pterodacty
 run through the normal setup process for the Panel if you do not have a database and environment setup
 already. This can be done by SSH'ing into the Panel environment and running `setup-pterodactyl`.
 
-The code for the setup can be found in `build/panel/setup-pterodactyl`. Please note, this environment uses
-Mutagen for file handling, so replace calls to `docker compse up` or `down` with `mutagen-compose up` or `down`.
-All other `docker compose` commands can be used as normal.
+The code for the setup can be found in `build/panel/setup-pterodactyl`.
