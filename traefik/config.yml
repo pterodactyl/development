@@ -1,0 +1,40 @@
+http:
+  middlewares:
+    compress:
+      compress: {}
+    strip-proxy-prefix:
+      stripPrefix:
+        prefixes:
+          - /s3.minio.pterodactyl.test
+    redirect-to-https:
+      redirectScheme:
+        scheme: https
+        permanent: false
+    app-headers:
+      headers:
+        customFrameOptionsValue: "SAMEORIGIN"
+        contentTypeNosniff: true
+        browserXssFilter: true
+  routers:
+    pterodactyl:
+      priority: 5
+      rule: Host(`pterodactyl.test`)
+      service: pterodactyl
+      entryPoints:
+        - https
+      middlewares:
+        - app-headers
+      tls:
+        options: default
+  services:
+    pterodactyl:
+      loadBalancer:
+        servers:
+          - url: http://app:8080
+tls:
+  options:
+    default:
+      minVersion: VersionTLS12
+  certificates:
+    - certFile: /etc/certs/pterodactyl.test.pem
+      keyFile: /etc/certs/pterodactyl.test-key.pem

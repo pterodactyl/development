@@ -3,15 +3,24 @@ global:
 api:
   insecure: true
   dashboard: true
-entryPoints:
-  https:
-    address: ":443"
 providers:
-  file:
-    filename: /etc/traefik/dynamic.yml
-    watch: true
   docker:
-    endpoint: unix:///var/run/docker.sock
-    exposedByDefault: false
+    watch: true
     network: pterodactyl
-
+    endpoint: "unix:///var/run/docker.sock"
+    exposedByDefault: false
+  file:
+    watch: true
+    filename: /etc/traefik/config.yml
+  providersThrottleDuration: "10"
+entryPoints:
+  http:
+    address: :80
+    http:
+      middlewares:
+        - compress@file
+  https:
+    address: :443
+    http:
+      middlewares:
+        - compress@file

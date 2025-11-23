@@ -53,7 +53,7 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
     && phpdismod xdebug \
     && rm -rf /tmp/*
 
-COPY ./build/panel/php/pool.d /etc/php/$PHP_VERSION/pool.d
+COPY ./build/panel/php/pool.d /etc/php/$PHP_VERSION/fpm/pool.d
 COPY ./build/panel/php/conf.d/*.ini /etc/php/$PHP_VERSION/fpm/conf.d
 COPY ./build/panel/php/conf.d/*.ini /etc/php/$PHP_VERSION/cli/conf.d
 COPY ./build/panel/configs/pterodactyl.conf /etc/nginx/sites-available/pterodactyl.conf
