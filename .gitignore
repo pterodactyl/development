@@ -1,5 +1,6 @@
 **/.DS_Store
 .idea
+.nvmrc
 
 docker/certificates/*
 !docker/certificates/.gitkeep
