@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -o pipefail
+
+if [ -n "$WWWUSER" ]; then
+    usermod -u "$WWWUSER" pterodactyl || exit 1
+fi
+
+cd /var/www/html || exit 1
+
+if [ -d "/etc/certs" ]; then
+  mkdir -p /usr/local/share/ca-certificates/mkcert
+  ln -sf /etc/certs/root_ca.pem /usr/local/share/ca-certificates/mkcert/root_ca.crt
+  ln -sf /etc/certs/pterodactyl.test.pem /usr/local/share/ca-certificates/mkcert/pterodactyl.test.pem
+  ln -sf /etc/certs/pterodactyl.test-key.pem /usr/local/share/ca-certificates/mkcert/pterodactyl.test-key.pem
+  update-ca-certificates
+fi
+
+find storage bootstrap/cache -type d -exec chmod 755 {} +
+find storage bootstrap/cache ! -name '*.gitignore' -type f -exec chmod 644 {} +

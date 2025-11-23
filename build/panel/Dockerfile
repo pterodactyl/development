@@ -1,72 +1,75 @@
-FROM debian:11-slim
+FROM debian:12-slim
 
 LABEL maintainer="dane@daneeveritt.com" \
 	  description="Local development environment for Pterodactyl Panel." \
 	  org.opencontainers.image.source=https://github.com/pterodactyl/development
 
-ENV DEBIAN_FRONTEND noninteractive
-ENV LANG=C.UTF-8
+ARG TARGETARCHI
+ARG TARGETPLATFORM
+ARG BUILDPLATFORM
+ARG PHP_VERSION=8.2
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    LANG=C.UTF-8 \
+    LC_ALL=C.UTF-8 \
+    PHP_VERSION=$PHP_VERSION \
+    PHP=php$PHP_VERSION
 
 USER root
 RUN apt -y update \
-    && apt -y --no-install-recommends install lsb-release ca-certificates apt-transport-https software-properties-common gnupg2 curl sudo  \
-    && curl -sL https://deb.nodesource.com/setup_14.x | bash - \
+    && apt -y --no-install-recommends install ca-certificates apt-transport-https software-properties-common \
+      gnupg2 curl sudo locales nginx unzip git supervisor cron default-mysql-client  \
+      iproute2 iputils-ping tar nano \
+    && curl -sL https://deb.nodesource.com/setup_22.x | bash - \
 	&& curl -sL https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
-	&& echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list \
-    && echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | tee /etc/apt/sources.list.d/sury-php.list \
-    && curl -sL https://packages.sury.org/php/apt.gpg | apt-key add - \
+    && curl -fsSL https://packages.sury.org/php/apt.gpg | gpg --dearmor -o /etc/apt/trusted.gpg.d/sury-keyring.gpg \
+    && echo "deb [signed-by=/etc/apt/trusted.gpg.d/sury-keyring.gpg] https://packages.sury.org/php/ bookworm main" | tee /etc/apt/sources.list.d/sury-php.list \
 	&& apt -y update \
-	&& apt -y upgrade \
-	&& apt -y --no-install-recommends install \
-        locales \
-        iproute2 \
-        iputils-ping \
-        lsb-release \
-        nginx \
-        tar \
-        unzip \
-        git \
-        supervisor \
-        cron \
-        nodejs \
-        yarn \
-        nano \
-	&& apt -y --no-install-recommends install php8.1 \
-		php8.1-cli \
-		php8.1-common \
-		php8.1-gd \
-		php8.1-mysql \
-		php8.1-mbstring \
-		php8.1-bcmath \
-		php8.1-xml \
-		php8.1-fpm \
-		php8.1-curl \
-		php8.1-zip \
-		php8.1-xdebug \
-	&& curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
+	&& apt -y --no-install-recommends install nodejs
+
+RUN apt -y --no-install-recommends install \
+      php8.2 \
+	  php8.2-cli \
+	  php8.2-common \
+	  php8.2-gd \
+	  php8.2-mysql \
+	  php8.2-mbstring \
+	  php8.2-bcmath \
+	  php8.2-xml \
+	  php8.2-fpm \
+	  php8.2-curl \
+	  php8.2-zip \
+	  php8.2-xdebug \
 	&& apt autoremove -y \
-	&& rm -rf /var/lib/apt/lists/*
+    && apt clean \
+	&& rm -rf /var/cache/apt/archives /var/cache/debconf /var/lib/apt/lists
 
-COPY entrypoint /usr/local/bin/entrypoint
-COPY setup-pterodactyl /usr/local/bin/setup-pterodactyl
-COPY configs/supervisord.conf /etc/supervisord.conf
-COPY configs/pterodactyl.conf /etc/nginx/sites-available/pterodactyl.conf
-
-RUN useradd -m pterodactyl \
-    && usermod -a -g www-data -G sudo pterodactyl \
-    && echo "%sudo ALL=(ALL:ALL) NOPASSWD: ALL" | tee /etc/sudoers.d/sudoers \
-    && chmod +x /usr/local/bin/setup-pterodactyl \
-    && chmod +x /usr/local/bin/entrypoint \
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
+    && npm i -g pnpm \
     && rm -rf /etc/nginx/sites-enabled/* \
-    && ln -s /etc/nginx/sites-available/pterodactyl.conf /etc/nginx/sites-enabled/ \
-    && phpdismod -s cli xdebug \
     && mkdir -p /var/run/php \
     && mkdir -p /var/www/html \
-    && (crontab -l 2>/dev/null; echo "* * * * * php /var/www/html/artisan schedule:run >> /dev/null 2>&1") | crontab -
+    && sed -i 's/;daemonize = yes/daemonize = no/' /etc/php/$PHP_VERSION/fpm/php-fpm.conf \
+    && useradd -m pterodactyl \
+    && usermod -a -g www-data -G sudo pterodactyl \
+    && echo "%sudo ALL=(ALL:ALL) NOPASSWD: ALL" | tee /etc/sudoers.d/sudoers \
+    && phpdismod xdebug \
+    && rm -rf /tmp/*
 
+COPY ./build/panel/php/pool.d /etc/php/$PHP_VERSION/pool.d
+COPY ./build/panel/php/conf.d/*.ini /etc/php/$PHP_VERSION/fpm/conf.d
+COPY ./build/panel/php/conf.d/*.ini /etc/php/$PHP_VERSION/cli/conf.d
+COPY ./build/panel/configs/pterodactyl.conf /etc/nginx/sites-available/pterodactyl.conf
+
+RUN (crontab -l 2>/dev/null; echo "* * * * * php /var/www/html/artisan schedule:run >> /dev/null 2>&1") | crontab - \
+    && ln -s /etc/nginx/sites-available/pterodactyl.conf /etc/nginx/sites-enabled/ \
+    && sed -i '/listen 8080 default_server;/a server_name pterodactyl.test;' /etc/nginx/sites-available/pterodactyl.conf \
+    && mv /etc/php/$PHP_VERSION/fpm/pool.d/www.conf /etc/php/$PHP_VERSION/fpm/pool.d/10-www.conf
+
+COPY ./build/panel/configs/supervisor/conf.d /etc/supervisor/conf.d
+COPY ./build/panel/configs/supervisor/supervisord.conf /etc/supervisor/supervisord.conf
+COPY --chmod=700 ./build/panel/scripts/* /usr/local/bin
+
+EXPOSE 80 8080
 WORKDIR /var/www/html
-
-EXPOSE 80
-EXPOSE 8080
-
 ENTRYPOINT ["entrypoint"]

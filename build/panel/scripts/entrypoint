@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -o pipefail
+
+if [ $# -gt 0 ]; then
+  sudo su -l pterodactyl -c "/bin/bash"
+else
+    configure-container || exit 1
+    tail --pid $$ -n 0 -q -F /var/www/html/storage/logs/*.log &
+    /usr/bin/supervisord -n -c /etc/supervisor/supervisord.conf
+fi
