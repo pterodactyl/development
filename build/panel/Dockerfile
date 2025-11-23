@@ -53,18 +53,17 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
     && phpdismod xdebug \
     && rm -rf /tmp/*
 
-COPY ./build/panel/php/pool.d /etc/php/$PHP_VERSION/fpm/pool.d
-COPY ./build/panel/php/conf.d/*.ini /etc/php/$PHP_VERSION/fpm/conf.d
-COPY ./build/panel/php/conf.d/*.ini /etc/php/$PHP_VERSION/cli/conf.d
+COPY ./build/panel/php/99-pool.conf /etc/php/$PHP_VERSION/fpm/pool.d/99-pool.conf
+COPY ./build/panel/php/99-pterodactyl.ini /etc/php/$PHP_VERSION/shared.d/99-pterodactyl.ini
 COPY ./build/panel/configs/pterodactyl.conf /etc/nginx/sites-available/pterodactyl.conf
 
 RUN (crontab -l 2>/dev/null; echo "* * * * * php /var/www/html/artisan schedule:run >> /dev/null 2>&1") | crontab - \
     && ln -s /etc/nginx/sites-available/pterodactyl.conf /etc/nginx/sites-enabled/ \
-    && sed -i '/listen 8080 default_server;/a server_name pterodactyl.test;' /etc/nginx/sites-available/pterodactyl.conf \
+    && ln -s /etc/php/$PHP_VERSION/shared.d/99-pterodactyl.ini /etc/php/$PHP_VERSION/fpm/99-pterodactyl.ini \
+    && ln -s /etc/php/$PHP_VERSION/shared.d/99-pterodactyl.ini /etc/php/$PHP_VERSION/cli/99-pterodactyl.ini \
     && mv /etc/php/$PHP_VERSION/fpm/pool.d/www.conf /etc/php/$PHP_VERSION/fpm/pool.d/10-www.conf
 
-COPY ./build/panel/configs/supervisor/conf.d /etc/supervisor/conf.d
-COPY ./build/panel/configs/supervisor/supervisord.conf /etc/supervisor/supervisord.conf
+COPY ./build/panel/configs/supervisor /etc/supervisor
 COPY --chmod=700 ./build/panel/scripts/* /usr/local/bin
 
 EXPOSE 80 8080

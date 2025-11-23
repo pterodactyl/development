@@ -15,6 +15,25 @@ http:
         customFrameOptionsValue: "SAMEORIGIN"
         contentTypeNosniff: true
         browserXssFilter: true
+    # These headers closely simulate what you would run into with AWS or other AWS-like
+    # services in a real environment.
+    minio-headers:
+      headers:
+        accessControlAllowCredentials: false
+        accessControlAllowMethods:
+          - "HEAD"
+          - "GET"
+        accessControlAllowOriginList:
+          - "https://pterodactyl.test"
+        addVaryHeader: false
+        frameDeny: false
+        contentTypeNosniff: false
+        browserXssFilter: false
+        customFrameOptionsValue: "SAMEORIGIN"
+        customResponseHeaders:
+          Access-Control-Expose-Headers: "ETag"
+          Access-Control-Max-Age: "300"
+          Vary: ""
   routers:
     pterodactyl:
       priority: 5
@@ -26,11 +45,31 @@ http:
         - app-headers
       tls:
         options: default
+    minio:
+      rule: Host(`s3.minio.pterodactyl.test`)
+      service: minio
+      middlewares:
+        - minio-headers
+      tls:
+        options: default
+    minioConsole:
+      rule: Host(`minio.pterodactyl.test`)
+      service: minioConsole
+      tls:
+        options: default
   services:
     pterodactyl:
       loadBalancer:
         servers:
           - url: http://app:8080
+    minio:
+      loadBalancer:
+        servers:
+          - url: http://minio:9000
+    minioConsole:
+      loadBalancer:
+        servers:
+          - url: http://minio:9001
 tls:
   options:
     default:

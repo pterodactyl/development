@@ -7,11 +7,9 @@ fi
 
 cd /var/www/html || exit 1
 
+mkdir -p /usr/local/share/ca-certificates/mkcert
 if [ -d "/etc/certs" ]; then
-  mkdir -p /usr/local/share/ca-certificates/mkcert
-  ln -sf /etc/certs/root_ca.pem /usr/local/share/ca-certificates/mkcert/root_ca.crt
-  ln -sf /etc/certs/pterodactyl.test.pem /usr/local/share/ca-certificates/mkcert/pterodactyl.test.pem
-  ln -sf /etc/certs/pterodactyl.test-key.pem /usr/local/share/ca-certificates/mkcert/pterodactyl.test-key.pem
+  ln -sf /etc/certs/* /usr/local/share/ca-certificates/mkcert
   update-ca-certificates
 fi
 

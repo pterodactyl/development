@@ -14,11 +14,6 @@ providers:
     filename: /etc/traefik/config.yml
   providersThrottleDuration: "10"
 entryPoints:
-  http:
-    address: :80
-    http:
-      middlewares:
-        - compress@file
   https:
     address: :443
     http:
