@@ -1,8 +1,8 @@
-FROM debian:11-slim
+FROM debian:12-slim
 
-ENV DEBIAN_FRONTEND=noninteractive
-ENV LANG=C.UTF-8
-ENV GOBIN=/usr/local/go/bin
+ENV DEBIAN_FRONTEND=noninteractive \
+    LANG=C.UTF-8 \
+    GOBIN=/usr/local/go/bin
 
 USER root
 RUN apt -y update \
@@ -21,21 +21,18 @@ RUN apt -y update \
         gcc \
         g++ \
         gdb \
-        python \
         docker-ce \
         docker-ce-cli \
         containerd.io \
         iproute2 \
         net-tools \
-    && curl -OL "https://go.dev/dl/go1.18.7.linux-$(dpkg --print-architecture).tar.gz" \
-    && tar xvf "go1.18.7.linux-$(dpkg --print-architecture).tar.gz" -C /usr/local \
+    && curl -OL "https://go.dev/dl/go1.23.7.linux-$(dpkg --print-architecture).tar.gz" \
+    && tar xvf "go1.23.7.linux-$(dpkg --print-architecture).tar.gz" -C /usr/local \
     && chown -R root:root /usr/local/go \
     && rm -rf go*.gz \
     && /usr/local/go/bin/go install github.com/go-delve/delve/cmd/dlv@latest \
     && usermod -aG docker root \
     && echo "export PATH=\$PATH:/usr/local/go/bin" >> /etc/bash.bashrc
 
-EXPOSE 8080
-EXPOSE 2022
-
+EXPOSE 8080 2022
 WORKDIR /home/root/wings

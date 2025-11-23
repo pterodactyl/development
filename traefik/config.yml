@@ -45,6 +45,11 @@ http:
         - app-headers
       tls:
         options: default
+    wings:
+      rule: Host(`wings.pterodactyl.test`)
+      service: wings
+      tls:
+        options: default
     minio:
       rule: Host(`s3.minio.pterodactyl.test`)
       service: minio
@@ -62,6 +67,10 @@ http:
       loadBalancer:
         servers:
           - url: http://app:8080
+    wings:
+      loadBalancer:
+        servers:
+          - url: http://wings:8080
     minio:
       loadBalancer:
         servers:

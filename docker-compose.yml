@@ -4,7 +4,11 @@ services:
     restart: unless-stopped
     command: --configFile=/etc/traefik/traefik.yml
     networks:
-      - traefik
+      traefik:
+        aliases:
+          - pterodactyl.test
+          - wings.pterodactyl.test
+          - s3.minio.pterodactyl.test
     ports:
       - "443:443"
       - "8080:8080"
@@ -34,10 +38,9 @@ services:
       WWWUSER: ${WWWUSER:-$$(id -u)}
       WWWGROUP: ${WWWGROUP:-$$(id -g)}
   wings:
-    image: ghcr.io/pterodactyl/development/wings:latest
-    # build:
-    #   context: ./build/wings
-    #   dockerfile: Dockerfile
+    # image: ghcr.io/pterodactyl/development/wings:latest
+    build:
+      dockerfile: ./build/wings/Dockerfile
     stop_grace_period: '1s'
     tty: true
     stdin_open: true
