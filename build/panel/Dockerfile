@@ -21,13 +21,10 @@ RUN apt -y update \
       gnupg2 curl sudo locales nginx unzip git supervisor cron default-mysql-client  \
       iproute2 iputils-ping tar nano \
     && curl -sL https://deb.nodesource.com/setup_22.x | bash - \
-	&& curl -sL https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
     && curl -fsSL https://packages.sury.org/php/apt.gpg | gpg --dearmor -o /etc/apt/trusted.gpg.d/sury-keyring.gpg \
     && echo "deb [signed-by=/etc/apt/trusted.gpg.d/sury-keyring.gpg] https://packages.sury.org/php/ bookworm main" | tee /etc/apt/sources.list.d/sury-php.list \
 	&& apt -y update \
-	&& apt -y --no-install-recommends install nodejs
-
-RUN apt -y --no-install-recommends install \
+    && apt -y --no-install-recommends install nodejs \
       php8.2 \
 	  php8.2-cli \
 	  php8.2-common \
