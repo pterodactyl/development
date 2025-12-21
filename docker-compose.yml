@@ -79,9 +79,9 @@ services:
       - ./docker/mysql:/docker-entrypoint-initdb.d:ro
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: panel
+      MYSQL_DATABASE: pterodactyl
       MYSQL_USER: pterodactyl
-      MYSQL_PASSWORD: pterodactyl
+      MYSQL_PASSWORD: password
     networks:
       - pterodactyl
     healthcheck:
