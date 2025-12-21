@@ -1,3 +1,3 @@
-create database if not exists panel_test;
-grant all on panel_test.* TO 'pterodactyl'@'%';
+create database if not exists testing;
+grant all on testing.* TO 'pterodactyl'@'%';
 flush privileges;
