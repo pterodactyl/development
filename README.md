@@ -1,4 +1,6 @@
-# Pterodactyl Development Environment
+[![Logo Image](https://cdn.pterodactyl.io/logos/new/pterodactyl_logo.png)](https://pterodactyl.io)
+
+# Pterodactyl Development
 This repository provides a `docker-compose` based environment for handling local development of Pterodactyl.
 
 **This is not meant for production use! This is a local development environment only.**
@@ -9,10 +11,9 @@ other than macOS, and I probably haven't documented most of the important bits. 
 PRs or Issues as necessary to improve this environment.
 
 ### Getting Started
-You'll need the following things installed on your machine.
+You'll need the following dependencies installed on your machine.
 
-* [Docker](https://docker.io)
-* [Mutagen Compose](https://github.com/mutagen-io/mutagen-compose)
+* [Orbstack](https://orbstack.dev)
 * [mkcert](https://github.com/FiloSottile/mkcert)
 
 ### Setup
@@ -40,6 +41,16 @@ Wings environments respectively. Your Panel is accessible at `https://pterodacty
 run through the normal setup process for the Panel if you do not have a database and environment setup
 already. This can be done by SSH'ing into the Panel environment and running `setup-pterodactyl`.
 
-The code for the setup can be found in `build/panel/setup-pterodactyl`. Please note, this environment uses
-Mutagen for file handling, so replace calls to `docker compse up` or `down` with `mutagen-compose up` or `down`.
-All other `docker compose` commands can be used as normal.
+The code for the setup can be found in `build/panel/setup-pterodactyl`. Ensure you run `yarn serve` or
+`yarn build` before accessing the Panel. You can run `yarn` inside the container, or just in the `code/panel`
+directory on your host machine, assuming you have `node >= 22`.
+
+### Running Wings
+You'll need to create a location and a node in the Panel instance before you can configure Wings. Set up the
+node _as being "Behind Proxy"_ and set the `Daemon Port` value to 443. Copy over the resulting `config.yml`
+file to `/home/root/wings/config.yml` on the Wings dev container.
+
+When you write that file, update the `port` value in the file to be `8080` since we're doing some proxying
+for the environment with Traefik.
+
+You should then be able to run `make debug` which will start the Wings daemon in debug mode.
