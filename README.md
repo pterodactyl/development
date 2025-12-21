@@ -33,8 +33,8 @@ cd development
 * Minio Container for S3 emulation
 
 ### Accessing the Environment
-Once you've setup the environment, simply run `./beak up -d` to start the environment. This simply aliases
-some common Docker compose commands.
+Once you've setup the environment, simply run `./beak build` and then `./beak up -d` to start the environment.
+`beak` aliases some common Docker compose commands, but everything else will pass through to `docker compose`.
 
 Once the environment is running, `./beak app` and `./beak wings` will allow SSH access to the Panel and
 Wings environments respectively. Your Panel is accessible at `https://pterodactyl.test`. You'll need to
