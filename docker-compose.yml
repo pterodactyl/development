@@ -67,7 +67,7 @@ services:
       - "3306:3306"
     command:
       - --innodb-buffer-pool-size=1G
-      - --innodb-log-file-size=256M
+      - --innodb_redo_log_capacity=536870912
       - --innodb-flush-log-at-trx-commit=0
       - --lower-case-table-names=1
       - --disabled_storage_engines=ARCHIVE,BLACKHOLE,CSV,MEMORY,MRG_MYISAM,MyISAM
