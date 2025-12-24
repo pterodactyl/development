@@ -10,7 +10,7 @@ sed -i "s/APP_DEBUG=.*/APP_DEBUG=true/" .env
 
 composer install --no-interaction --prefer-dist --no-scripts --no-progress
 php artisan config:clear
-yarn install --no-progress
+pnpm i -s
 
 sudo chown -R pterodactyl:www-data storage bootstrap/cache
 sudo find storage bootstrap/cache ! -name '*.gitignore' -exec chmod 755 {} +
