@@ -1,6 +1,6 @@
-create database if not exists pterodactyl_test;
+create database if not exists testing;
 
-grant all on pterodactyl_test.* TO 'pterodactyl'@'%';
-grant all on `pterodactyl\_test\_test_%`.* TO 'pterodactyl'@'%';
+grant all on testing.* TO 'pterodactyl'@'%';
+grant all on `testing\_test_%`.* TO 'pterodactyl'@'%';
 
 flush privileges;

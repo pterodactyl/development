@@ -4,11 +4,11 @@ on:
   push:
     branches:
       - master
-permissions:
-  packages: write
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
+    permissions:
+      packages: write
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-qemu-action@v3
